@@ -68,7 +68,13 @@ const Index: React.FC = () => {
   return (
     <main className="flex min-h-screen">
       <div className="flex-1 bg-white p-8 flex items-center justify-center">
-        <CircleDiagram />
+        <CircleDiagram 
+          groups={groups}
+          groupCount={groupCount}
+          onUpdateGroupCount={updateGroupCount}
+          onUpdateGroupConfig={updateGroupConfig}
+          onUpdateProgress={updateSliceProgress}
+        />
       </div>
       <div className="w-[600px] bg-[#F3F3F3] p-8 overflow-y-auto">
         <div className="flex flex-col gap-6">

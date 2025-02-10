@@ -1,17 +1,23 @@
+
 import React, { useState, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Group } from './types';
-import { generateGroups } from './utils';
 import { PathGenerators } from './PathGenerators';
-import { GroupControls } from './GroupControls';
 import { CircleSlice } from './components/CircleSlice';
 import { CircleDefinitions } from './components/CircleDefinitions';
 
-export const CircleDiagram: React.FC = () => {
-  const [groupCount, setGroupCount] = useState<number>(3);
-  const [groups, setGroups] = useState<Group[]>(generateGroups(3));
+interface CircleDiagramProps {
+  groups: Group[];
+  groupCount: number;
+  onUpdateGroupCount: (count: number) => void;
+  onUpdateGroupConfig: (groupIndex: number, color?: string, rankingColor?: string, sliceCount?: number) => void;
+  onUpdateProgress: (groupIndex: number, sliceIndex: number, progress: number) => void;
+}
+
+export const CircleDiagram: React.FC<CircleDiagramProps> = ({
+  groups,
+  groupCount,
+}) => {
   const [centerImage, setCenterImage] = useState<string>("/lovable-uploads/ad390dfb-65ef-43f9-a728-84385f728052.png");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -32,59 +38,6 @@ export const CircleDiagram: React.FC = () => {
   }, Array(groups.length).fill(0));
 
   const pathGenerators = new PathGenerators(config, totalSlices, slicesBeforeGroup);
-
-  const updateGroupCount = (newGroupCount: number) => {
-    setGroupCount(newGroupCount);
-    setGroups(prevGroups => generateGroups(newGroupCount, prevGroups));
-  };
-
-  const updateGroupConfig = (groupIndex: number, color?: string, rankingColor?: string, sliceCount?: number) => {
-    setGroups(prevGroups => {
-      const newGroups = [...prevGroups];
-      const currentGroup = { ...newGroups[groupIndex] };
-      
-      if (color !== undefined) {
-        currentGroup.color = color;
-        currentGroup.slices = currentGroup.slices.map(slice => ({
-          ...slice,
-          color
-        }));
-      }
-
-      if (rankingColor !== undefined) {
-        currentGroup.rankingColor = rankingColor;
-        currentGroup.slices = currentGroup.slices.map(slice => ({
-          ...slice,
-          rankingColor
-        }));
-      }
-      
-      if (sliceCount !== undefined) {
-        currentGroup.sliceCount = sliceCount;
-        currentGroup.slices = Array.from({ length: sliceCount }, (_, i) => ({
-          color: currentGroup.color,
-          rankingColor: currentGroup.rankingColor,
-          label: `Slice ${i + 1}`,
-          progress: 0
-        }));
-      }
-      
-      newGroups[groupIndex] = currentGroup;
-      return newGroups;
-    });
-  };
-
-  const updateSliceProgress = (groupIndex: number, sliceIndex: number, progress: number) => {
-    setGroups(prevGroups => {
-      const newGroups = [...prevGroups];
-      const currentGroup = { ...newGroups[groupIndex] };
-      const currentSlice = { ...currentGroup.slices[sliceIndex] };
-      currentSlice.progress = Math.max(0, Math.min(5, progress));
-      currentGroup.slices[sliceIndex] = currentSlice;
-      newGroups[groupIndex] = currentGroup;
-      return newGroups;
-    });
-  };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
