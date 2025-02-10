@@ -1,3 +1,4 @@
+
 import React, { useRef, useState } from "react";
 import { CircleDiagram } from "@/components/CircleDiagram/CircleDiagram";
 import { Button } from "@/components/ui/button";
@@ -41,7 +42,6 @@ const Index: React.FC = () => {
         }));
       });
       
-      // Update all indicators with new global groups, but preserve their progress values
       setIndicators(prevIndicators => 
         prevIndicators.map(indicator => {
           const newGroups = groups.map((group, groupIndex) => ({
@@ -66,7 +66,7 @@ const Index: React.FC = () => {
     });
   };
 
-  const updateThemeConfig = (themeIndex: number, color?: string, rankingColor?: string) => {
+  const updateThemeConfig = (themeIndex: number, color?: string, rankingColor?: string, sliceCount?: number) => {
     setGlobalConfig(prev => {
       const newGroups = [...prev.groups];
       const currentTheme = { ...newGroups[themeIndex] };
@@ -86,10 +86,20 @@ const Index: React.FC = () => {
           rankingColor
         }));
       }
+
+      if (sliceCount !== undefined) {
+        currentTheme.sliceCount = sliceCount;
+        const newSlices = Array.from({ length: sliceCount }, (_, i) => ({
+          color: currentTheme.color,
+          rankingColor: currentTheme.rankingColor,
+          label: `Slice ${i + 1}`,
+          progress: 0
+        }));
+        currentTheme.slices = newSlices;
+      }
       
       newGroups[themeIndex] = currentTheme;
 
-      // Update all indicators with new theme colors while preserving progress
       setIndicators(prevIndicators => 
         prevIndicators.map(indicator => ({
           ...indicator,
@@ -97,7 +107,7 @@ const Index: React.FC = () => {
             ...group,
             slices: group.slices.map((slice, sliceIndex) => ({
               ...slice,
-              progress: indicator.groups[groupIndex].slices[sliceIndex].progress
+              progress: indicator.groups[groupIndex]?.slices[sliceIndex]?.progress || 0
             }))
           }))
         }))
@@ -213,44 +223,47 @@ const Index: React.FC = () => {
                       className="w-20"
                     />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">Slices per Theme:</span>
-                    <Input
-                      type="number"
-                      min="1"
-                      max="20"
-                      value={globalConfig.sliceCount}
-                      onChange={(e) => updateGlobalConfig(undefined, Number(e.target.value))}
-                      className="w-20"
-                    />
-                  </div>
                 </div>
                 {globalConfig.groups.map((theme, themeIndex) => (
-                  <div key={themeIndex} className="flex items-center gap-4">
-                    <span className="text-sm font-medium min-w-[100px]">{theme.label}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm">Slice Color:</span>
-                      <input
-                        type="color"
-                        value={theme.color}
-                        onChange={(e) => updateThemeConfig(themeIndex, e.target.value)}
-                        className="w-8 h-8 !p-0 rounded-md overflow-hidden"
-                      />
+                  <div key={themeIndex} className="flex flex-col gap-4">
+                    <div className="flex items-center gap-4">
+                      <span className="text-sm font-medium min-w-[100px]">{theme.label}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">Slice Color:</span>
+                        <input
+                          type="color"
+                          value={theme.color}
+                          onChange={(e) => updateThemeConfig(themeIndex, e.target.value)}
+                          className="w-8 h-8 !p-0 rounded-md overflow-hidden"
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">Ranking Color:</span>
+                        <input
+                          type="color"
+                          value={theme.rankingColor}
+                          onChange={(e) => updateThemeConfig(themeIndex, undefined, e.target.value)}
+                          className="w-8 h-8 !p-0 rounded-md overflow-hidden"
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">Slices:</span>
+                        <Input
+                          type="number"
+                          min="1"
+                          max="20"
+                          value={theme.sliceCount}
+                          onChange={(e) => updateThemeConfig(themeIndex, undefined, undefined, Number(e.target.value))}
+                          className="w-20"
+                        />
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm">Ranking Color:</span>
-                      <input
-                        type="color"
-                        value={theme.rankingColor}
-                        onChange={(e) => updateThemeConfig(themeIndex, undefined, e.target.value)}
-                        className="w-8 h-8 !p-0 rounded-md overflow-hidden"
-                      />
-                    </div>
+                    <div className="border-b border-gray-200 opacity-30" />
                   </div>
                 ))}
               </div>
               
-              <div className="border-b border-border opacity-30" />
+              <div className="border-b border-gray-200 opacity-30" />
               
               <div className="flex flex-col gap-4 p-4 border rounded-lg bg-white">
                 <div className="flex items-center justify-between">
