@@ -2,16 +2,13 @@
 import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { Group } from './types';
 import { generateGroups } from './utils';
 import { PathGenerators } from './PathGenerators';
 import { GroupControls } from './GroupControls';
+import { CircleSlice } from './components/CircleSlice';
+import { CircleDefinitions } from './components/CircleDefinitions';
 
 export const CircleDiagram: React.FC = () => {
   const [groupCount, setGroupCount] = useState<number>(3);
@@ -147,75 +144,24 @@ export const CircleDiagram: React.FC = () => {
       
       <TooltipProvider>
         <svg width={config.svgSize} height={config.svgSize} viewBox={`0 0 ${config.svgSize} ${config.svgSize}`}>
-          <defs>
-            <filter id="centerShadow">
-              <feGaussianBlur in="SourceAlpha" stdDeviation="8" />
-              <feOffset dx="0" dy="0" result="offsetblur" />
-              <feFlood floodColor="#535353" floodOpacity="0.5" />
-              <feComposite in2="offsetblur" operator="in" />
-              <feMerge>
-                <feMergeNode />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-            <clipPath id="centerCircleClip">
-              <circle
-                cx={config.outerRadius}
-                cy={config.outerRadius}
-                r={config.centerRadius}
-              />
-            </clipPath>
-            {groups.map((group, groupIndex) =>
-              group.slices.map((slice, sliceIndex) => (
-                <clipPath 
-                  key={`clip-${groupIndex}-${sliceIndex}`} 
-                  id={`slice-clip-${groupIndex}-${sliceIndex}`}
-                >
-                  <path d={pathGenerators.createSlicePath(sliceIndex, groupIndex)} />
-                </clipPath>
-              ))
-            )}
-          </defs>
+          <CircleDefinitions
+            config={config}
+            groups={groups}
+            pathGenerators={pathGenerators}
+          />
 
           {/* Outer circle slices */}
           {groups.map((group, groupIndex) => (
             group.slices.map((slice, sliceIndex) => (
-              <Tooltip key={`slice-${groupIndex}-${sliceIndex}`}>
-                <TooltipTrigger asChild>
-                  <g>
-                    <path
-                      d={pathGenerators.createSlicePath(sliceIndex, groupIndex)}
-                      fill={group.color}
-                      stroke="white"
-                      strokeWidth={config.strokeWidth}
-                      className="cursor-pointer hover:opacity-90 transition-opacity"
-                    />
-                    {/* Progress circles */}
-                    {Array.from({ length: slice.progress }, (_, i) => (
-                      <path
-                        key={`progress-${groupIndex}-${sliceIndex}-${i}`}
-                        d={pathGenerators.createProgressCirclePath(sliceIndex, groupIndex, i + 1)}
-                        stroke={group.rankingColor}
-                        strokeWidth={config.rankingStrokeWidth}
-                        fill="none"
-                        clipPath={`url(#slice-clip-${groupIndex}-${sliceIndex})`}
-                      />
-                    ))}
-                  </g>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="p-4 w-[300px] space-y-3 bg-white shadow-lg rounded-lg border-none">
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-900">{group.label}</h3>
-                    <h4 className="text-lg font-medium text-gray-800 mt-1">{slice.label}</h4>
-                    <div className="text-base font-medium text-gray-700 mt-1">
-                      Progress Level: {slice.progress}
-                    </div>
-                  </div>
-                  <p className="text-gray-500 text-sm leading-relaxed">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam hendrerit nisi sed sollicitudin pellentesque.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
+              <CircleSlice
+                key={`slice-${groupIndex}-${sliceIndex}`}
+                group={group}
+                slice={slice}
+                sliceIndex={sliceIndex}
+                groupIndex={groupIndex}
+                pathGenerators={pathGenerators}
+                config={config}
+              />
             ))
           ))}
 
