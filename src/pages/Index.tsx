@@ -46,40 +46,43 @@ const Index: React.FC = () => {
       const newGroups = Array.from({ length: themeCount }, (_, index) => {
         if (index < prev.groups.length) {
           // Keep existing group settings
+          const existingGroup = prev.groups[index];
           return {
-            ...prev.groups[index],
+            ...existingGroup,
             sliceCount: sliceCount,
             slices: Array.from({ length: sliceCount }, (_, i) => ({
-              color: prev.groups[index].color,
-              rankingColor: prev.groups[index].rankingColor,
+              ...existingGroup.slices[i % existingGroup.slices.length],
               label: `Slice ${i + 1}`,
-              progress: 0
             }))
           };
         } else {
           // Generate new group for additional themes
+          const newGroup = generateGroups(1)[0];
           return {
-            ...generateGroups(1)[0],
+            ...newGroup,
             label: `Theme ${index + 1}`,
-            sliceCount: sliceCount
+            sliceCount: sliceCount,
+            slices: Array.from({ length: sliceCount }, (_, i) => ({
+              color: newGroup.color,
+              rankingColor: newGroup.rankingColor,
+              label: `Slice ${i + 1}`,
+              progress: 0
+            }))
           };
         }
       });
       
       setIndicators(prevIndicators => 
-        prevIndicators.map(indicator => {
-          const newIndicatorGroups = newGroups.map((group, groupIndex) => ({
+        prevIndicators.map(indicator => ({
+          ...indicator,
+          groups: newGroups.map((group, groupIndex) => ({
             ...group,
             slices: group.slices.map((slice, sliceIndex) => ({
               ...slice,
               progress: indicator.groups[groupIndex]?.slices[sliceIndex]?.progress || 0
             }))
-          }));
-          return {
-            ...indicator,
-            groups: newIndicatorGroups
-          };
-        })
+          }))
+        }))
       );
 
       toast({
