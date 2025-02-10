@@ -203,14 +203,17 @@ export const CircleDiagram: React.FC = () => {
                     ))}
                   </g>
                 </TooltipTrigger>
-                <TooltipContent>
-                  <div className="space-y-2">
-                    <p className="font-semibold">{group.label}</p>
-                    <p>{slice.label}</p>
-                    <p className="text-xs text-muted-foreground max-w-[200px]">
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore.
-                    </p>
+                <TooltipContent side="right" className="p-4 w-[300px] space-y-3 bg-white shadow-lg rounded-lg border-none">
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900">{group.label}</h3>
+                    <h4 className="text-lg font-medium text-gray-800 mt-1">{slice.label}</h4>
+                    <div className="text-base font-medium text-gray-700 mt-1">
+                      Progress Level: {slice.progress}
+                    </div>
                   </div>
+                  <p className="text-gray-500 text-sm leading-relaxed">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam hendrerit nisi sed sollicitudin pellentesque.
+                  </p>
                 </TooltipContent>
               </Tooltip>
             ))

@@ -7,7 +7,8 @@ export const generateGroup = (sliceCount: number, color: string = '#E2E2E2', ran
     color,
     rankingColor,
     label: `Slice ${i + 1}`,
-    progress: 0
+    progress: 0,
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam hendrerit nisi sed sollicitudin pellentesque."
   })),
   color,
   rankingColor,

@@ -4,6 +4,7 @@ export interface Slice {
   rankingColor: string;
   label: string;
   progress: number;
+  description?: string;
 }
 
 export interface Group {
