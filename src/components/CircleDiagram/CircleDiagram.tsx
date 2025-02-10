@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -5,6 +6,7 @@ import { Input } from "@/components/ui/input";
 interface Slice {
   color: string;
   label: string;
+  progress: number; // 0-5 ranking
 }
 
 interface Group {
@@ -18,7 +20,8 @@ const generateGroup = (sliceCount: number, color: string = '#E2E2E2'): Group => 
   label: `Group`,
   slices: Array.from({ length: sliceCount }, (_, i) => ({
     color,
-    label: `Slice ${i + 1}`
+    label: `Slice ${i + 1}`,
+    progress: 0
   })),
   color,
   sliceCount
@@ -45,13 +48,13 @@ export const CircleDiagram: React.FC = () => {
   const centerRadius = 150;
   const middleRadius = 180;
   const outerRadius = 300;
+  const progressStep = 24; // Each progress level adds 24px
   const svgSize = outerRadius * 2 + 100;
   const strokeWidth = 4;
 
   const createMiddleCirclePath = (groupIndex: number, totalGroups: number) => {
     const availableAngle = 2 * Math.PI;
     
-    // Calculate the start and end angles based on the slices in previous groups
     const slicesBeforeGroup = groups.slice(0, groupIndex).reduce((acc, group) => acc + group.slices.length, 0);
     const groupSlices = groups[groupIndex].slices.length;
     
@@ -100,6 +103,27 @@ export const CircleDiagram: React.FC = () => {
     `;
   };
 
+  const createProgressCirclePath = (sliceIndex: number, groupIndex: number, totalSlices: number, progressLevel: number) => {
+    const progressRadius = middleRadius + (progressLevel * progressStep);
+    const availableAngle = 2 * Math.PI;
+    const sliceAngle = availableAngle / totalSlices;
+    const absoluteSliceIndex = groups.slice(0, groupIndex).reduce((acc, group) => acc + group.slices.length, 0) + sliceIndex;
+    const startAngle = absoluteSliceIndex * sliceAngle;
+    const endAngle = startAngle + sliceAngle;
+
+    const startX = outerRadius + Math.cos(startAngle) * progressRadius;
+    const startY = outerRadius + Math.sin(startAngle) * progressRadius;
+    const endX = outerRadius + Math.cos(endAngle) * progressRadius;
+    const endY = outerRadius + Math.sin(endAngle) * progressRadius;
+
+    const largeArcFlag = endAngle - startAngle <= Math.PI ? "0" : "1";
+
+    return `
+      M ${startX} ${startY}
+      A ${progressRadius} ${progressRadius} 0 ${largeArcFlag} 1 ${endX} ${endY}
+    `;
+  };
+
   const totalSlices = groups.reduce((acc, group) => acc + group.slices.length, 0);
 
   const updateGroupCount = (newGroupCount: number) => {
@@ -120,10 +144,23 @@ export const CircleDiagram: React.FC = () => {
         currentGroup.sliceCount = sliceCount;
         currentGroup.slices = Array.from({ length: sliceCount }, (_, i) => ({
           color: currentGroup.color,
-          label: `Slice ${i + 1}`
+          label: `Slice ${i + 1}`,
+          progress: 0
         }));
       }
       
+      newGroups[groupIndex] = currentGroup;
+      return newGroups;
+    });
+  };
+
+  const updateSliceProgress = (groupIndex: number, sliceIndex: number, progress: number) => {
+    setGroups(prevGroups => {
+      const newGroups = [...prevGroups];
+      const currentGroup = { ...newGroups[groupIndex] };
+      const currentSlice = { ...currentGroup.slices[sliceIndex] };
+      currentSlice.progress = Math.max(0, Math.min(5, progress)); // Clamp between 0 and 5
+      currentGroup.slices[sliceIndex] = currentSlice;
       newGroups[groupIndex] = currentGroup;
       return newGroups;
     });
@@ -157,28 +194,45 @@ export const CircleDiagram: React.FC = () => {
       </div>
 
       <div className="flex flex-col gap-4 w-full max-w-xl">
-        {groups.map((group, index) => (
-          <div key={index} className="flex items-center gap-4 p-4 border rounded-lg">
-            <span className="text-sm font-medium min-w-[100px]">{group.label}</span>
-            <div className="flex items-center gap-2">
-              <span className="text-sm">Color:</span>
-              <input
-                type="color"
-                value={group.color}
-                onChange={(e) => updateGroupConfig(index, e.target.value)}
-                className="w-14 h-8"
-              />
+        {groups.map((group, groupIndex) => (
+          <div key={groupIndex} className="flex flex-col gap-4 p-4 border rounded-lg">
+            <div className="flex items-center gap-4">
+              <span className="text-sm font-medium min-w-[100px]">{group.label}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm">Color:</span>
+                <input
+                  type="color"
+                  value={group.color}
+                  onChange={(e) => updateGroupConfig(groupIndex, e.target.value)}
+                  className="w-14 h-8"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm">Slices:</span>
+                <Input
+                  type="number"
+                  min="1"
+                  max="20"
+                  value={group.sliceCount}
+                  onChange={(e) => updateGroupConfig(groupIndex, undefined, Number(e.target.value))}
+                  className="w-20"
+                />
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm">Slices:</span>
-              <Input
-                type="number"
-                min="1"
-                max="20"
-                value={group.sliceCount}
-                onChange={(e) => updateGroupConfig(index, undefined, Number(e.target.value))}
-                className="w-20"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              {group.slices.map((slice, sliceIndex) => (
+                <div key={sliceIndex} className="flex items-center gap-2">
+                  <span className="text-sm">Slice {sliceIndex + 1} Progress:</span>
+                  <Input
+                    type="number"
+                    min="0"
+                    max="5"
+                    value={slice.progress}
+                    onChange={(e) => updateSliceProgress(groupIndex, sliceIndex, Number(e.target.value))}
+                    className="w-20"
+                  />
+                </div>
+              ))}
             </div>
           </div>
         ))}
@@ -219,18 +273,40 @@ export const CircleDiagram: React.FC = () => {
               r={centerRadius}
             />
           </clipPath>
+          {groups.map((group, groupIndex) =>
+            group.slices.map((slice, sliceIndex) => (
+              <clipPath 
+                key={`clip-${groupIndex}-${sliceIndex}`} 
+                id={`slice-clip-${groupIndex}-${sliceIndex}`}
+              >
+                <path d={createSlicePath(sliceIndex, groupIndex, totalSlices)} />
+              </clipPath>
+            ))
+          )}
         </defs>
 
         {/* Outer circle slices */}
         {groups.map((group, groupIndex) => (
           group.slices.map((slice, sliceIndex) => (
-            <path
-              key={`${groupIndex}-${sliceIndex}`}
-              d={createSlicePath(sliceIndex, groupIndex, totalSlices)}
-              fill={group.color}
-              stroke="white"
-              strokeWidth={strokeWidth}
-            />
+            <React.Fragment key={`slice-${groupIndex}-${sliceIndex}`}>
+              <path
+                d={createSlicePath(sliceIndex, groupIndex, totalSlices)}
+                fill={group.color}
+                stroke="white"
+                strokeWidth={strokeWidth}
+              />
+              {/* Progress circles */}
+              {Array.from({ length: slice.progress }, (_, i) => (
+                <path
+                  key={`progress-${groupIndex}-${sliceIndex}-${i}`}
+                  d={createProgressCirclePath(sliceIndex, groupIndex, totalSlices, i + 1)}
+                  stroke={group.color}
+                  strokeWidth={strokeWidth}
+                  fill="none"
+                  clipPath={`url(#slice-clip-${groupIndex}-${sliceIndex})`}
+                />
+              ))}
+            </React.Fragment>
           ))
         ))}
 
@@ -268,3 +344,4 @@ export const CircleDiagram: React.FC = () => {
     </div>
   );
 };
+
