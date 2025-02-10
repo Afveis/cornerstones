@@ -1,4 +1,3 @@
-
 import React, { useRef, useState } from "react";
 import { CircleDiagram } from "@/components/CircleDiagram/CircleDiagram";
 import { Button } from "@/components/ui/button";
@@ -174,7 +173,7 @@ const Index: React.FC = () => {
           <div className="p-8">
             <div className="flex flex-col gap-6">
               <div className="flex flex-col gap-4 p-4 border rounded-lg bg-white">
-                <h2 className="text-lg font-semibold">Global Configuration</h2>
+                <h2 className="text-lg font-semibold">Theme Configuration</h2>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium">Number of Themes:</span>
