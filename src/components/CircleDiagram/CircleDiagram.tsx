@@ -1,6 +1,12 @@
 import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Slice {
   color: string;
@@ -280,93 +286,109 @@ export const CircleDiagram: React.FC = () => {
         </Button>
       </div>
       
-      <svg width={svgSize} height={svgSize} viewBox={`0 0 ${svgSize} ${svgSize}`}>
-        <defs>
-          <filter id="centerShadow">
-            <feGaussianBlur in="SourceAlpha" stdDeviation="8" />
-            <feOffset dx="0" dy="0" result="offsetblur" />
-            <feFlood floodColor="#535353" floodOpacity="0.5" />
-            <feComposite in2="offsetblur" operator="in" />
-            <feMerge>
-              <feMergeNode />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-          <clipPath id="centerCircleClip">
-            <circle
-              cx={outerRadius}
-              cy={outerRadius}
-              r={centerRadius}
-            />
-          </clipPath>
-          {groups.map((group, groupIndex) =>
-            group.slices.map((slice, sliceIndex) => (
-              <clipPath 
-                key={`clip-${groupIndex}-${sliceIndex}`} 
-                id={`slice-clip-${groupIndex}-${sliceIndex}`}
-              >
-                <path d={createSlicePath(sliceIndex, groupIndex, totalSlices)} />
-              </clipPath>
-            ))
-          )}
-        </defs>
-
-        {/* Outer circle slices */}
-        {groups.map((group, groupIndex) => (
-          group.slices.map((slice, sliceIndex) => (
-            <React.Fragment key={`slice-${groupIndex}-${sliceIndex}`}>
-              <path
-                d={createSlicePath(sliceIndex, groupIndex, totalSlices)}
-                fill={group.color}
-                stroke="white"
-                strokeWidth={strokeWidth}
+      <TooltipProvider>
+        <svg width={svgSize} height={svgSize} viewBox={`0 0 ${svgSize} ${svgSize}`}>
+          <defs>
+            <filter id="centerShadow">
+              <feGaussianBlur in="SourceAlpha" stdDeviation="8" />
+              <feOffset dx="0" dy="0" result="offsetblur" />
+              <feFlood floodColor="#535353" floodOpacity="0.5" />
+              <feComposite in2="offsetblur" operator="in" />
+              <feMerge>
+                <feMergeNode />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            <clipPath id="centerCircleClip">
+              <circle
+                cx={outerRadius}
+                cy={outerRadius}
+                r={centerRadius}
               />
-              {/* Progress circles */}
-              {Array.from({ length: slice.progress }, (_, i) => (
-                <path
-                  key={`progress-${groupIndex}-${sliceIndex}-${i}`}
-                  d={createProgressCirclePath(sliceIndex, groupIndex, totalSlices, i + 1)}
-                  stroke={group.rankingColor}
-                  strokeWidth={rankingStrokeWidth}
-                  fill="none"
-                  clipPath={`url(#slice-clip-${groupIndex}-${sliceIndex})`}
-                />
-              ))}
-            </React.Fragment>
-          ))
-        ))}
+            </clipPath>
+            {groups.map((group, groupIndex) =>
+              group.slices.map((slice, sliceIndex) => (
+                <clipPath 
+                  key={`clip-${groupIndex}-${sliceIndex}`} 
+                  id={`slice-clip-${groupIndex}-${sliceIndex}`}
+                >
+                  <path d={createSlicePath(sliceIndex, groupIndex, totalSlices)} />
+                </clipPath>
+              ))
+            )}
+          </defs>
 
-        {/* Middle circle divided by groups */}
-        {groups.map((group, index) => (
-          <path
-            key={`middle-${index}`}
-            d={createMiddleCirclePath(index, groups.length)}
-            fill={group.color}
-            stroke="white"
-            strokeWidth={strokeWidth}
+          {/* Outer circle slices */}
+          {groups.map((group, groupIndex) => (
+            group.slices.map((slice, sliceIndex) => (
+              <Tooltip key={`slice-${groupIndex}-${sliceIndex}`}>
+                <TooltipTrigger asChild>
+                  <g>
+                    <path
+                      d={createSlicePath(sliceIndex, groupIndex, totalSlices)}
+                      fill={group.color}
+                      stroke="white"
+                      strokeWidth={strokeWidth}
+                      className="cursor-pointer hover:opacity-90 transition-opacity"
+                    />
+                    {/* Progress circles */}
+                    {Array.from({ length: slice.progress }, (_, i) => (
+                      <path
+                        key={`progress-${groupIndex}-${sliceIndex}-${i}`}
+                        d={createProgressCirclePath(sliceIndex, groupIndex, totalSlices, i + 1)}
+                        stroke={group.rankingColor}
+                        strokeWidth={rankingStrokeWidth}
+                        fill="none"
+                        clipPath={`url(#slice-clip-${groupIndex}-${sliceIndex})`}
+                      />
+                    ))}
+                  </g>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <div className="space-y-2">
+                    <p className="font-semibold">{group.label}</p>
+                    <p>{slice.label}</p>
+                    <p className="text-xs text-muted-foreground max-w-[200px]">
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore.
+                    </p>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            ))
+          ))}
+
+          {/* Middle circle divided by groups */}
+          {groups.map((group, index) => (
+            <path
+              key={`middle-${index}`}
+              d={createMiddleCirclePath(index, groups.length)}
+              fill={group.color}
+              stroke="white"
+              strokeWidth={strokeWidth}
+            />
+          ))}
+          
+          {/* White center circle with shadow */}
+          <circle
+            cx={outerRadius}
+            cy={outerRadius}
+            r={centerRadius}
+            fill="white"
+            stroke="#E5E7EB"
+            filter="url(#centerShadow)"
           />
-        ))}
-        
-        {/* White center circle with shadow */}
-        <circle
-          cx={outerRadius}
-          cy={outerRadius}
-          r={centerRadius}
-          fill="white"
-          stroke="#E5E7EB"
-          filter="url(#centerShadow)"
-        />
-        
-        <image
-          x={outerRadius - centerRadius + 20}
-          y={outerRadius - centerRadius + 20}
-          width={centerRadius * 2 - 40}
-          height={centerRadius * 2 - 40}
-          href={centerImage}
-          preserveAspectRatio="xMidYMid meet"
-          clipPath="url(#centerCircleClip)"
-        />
-      </svg>
+          
+          <image
+            x={outerRadius - centerRadius + 20}
+            y={outerRadius - centerRadius + 20}
+            width={centerRadius * 2 - 40}
+            height={centerRadius * 2 - 40}
+            href={centerImage}
+            preserveAspectRatio="xMidYMid meet"
+            clipPath="url(#centerCircleClip)"
+          />
+        </svg>
+      </TooltipProvider>
     </div>
   );
 };
