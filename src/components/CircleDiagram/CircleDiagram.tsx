@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Group } from './types';
@@ -55,25 +56,8 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
   const pathGenerators = new PathGenerators(config, totalSlices, slicesBeforeGroup);
 
   const handleCenterCircleClick = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          if (e.target?.result) {
-            const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-            const changeEvent = new Event('change', { bubbles: true });
-            Object.defineProperty(changeEvent, 'target', { value: { files: [file] } });
-            fileInput?.dispatchEvent(changeEvent);
-          }
-        };
-        reader.readAsDataURL(file);
-      }
-    };
-    input.click();
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    fileInput?.click();
   };
 
   return (
@@ -121,8 +105,8 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
             style={{ cursor: 'pointer' }}
           >
             <circle
-              cx={config.outerRadius}
-              cy={config.outerRadius}
+              cx={config.svgSize / 2}
+              cy={config.svgSize / 2}
               r={config.centerRadius}
               fill="white"
               stroke="#E5E7EB"
@@ -132,8 +116,8 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
             />
             
             <image
-              x={config.outerRadius - config.centerRadius + 20}
-              y={config.outerRadius - config.centerRadius + 20}
+              x={config.svgSize / 2 - config.centerRadius + 20}
+              y={config.svgSize / 2 - config.centerRadius + 20}
               width={config.centerRadius * 2 - 40}
               height={config.centerRadius * 2 - 40}
               href={centerImage}
@@ -145,8 +129,8 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
 
             {isHovered && (
               <foreignObject
-                x={config.outerRadius - 60}
-                y={config.outerRadius - 20}
+                x={config.svgSize / 2 - 60}
+                y={config.svgSize / 2 - 20}
                 width={120}
                 height={40}
               >
