@@ -1,13 +1,11 @@
-
 import React, { useRef, useState } from "react";
 import { CircleDiagram } from "@/components/CircleDiagram/CircleDiagram";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { GroupControls } from "@/components/CircleDiagram/GroupControls";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Group, Indicator, GlobalConfig } from "@/components/CircleDiagram/types";
 import { generateGroups } from "@/components/CircleDiagram/utils";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Card } from "@/components/ui/card";
+import { ThemeConfiguration } from "@/components/CircleDiagram/ThemeConfiguration";
+import { IndicatorCard } from "@/components/CircleDiagram/IndicatorCard";
+import { IndicatorControls } from "@/components/CircleDiagram/IndicatorControls";
 
 const Index: React.FC = () => {
   const [activeIndicator, setActiveIndicator] = useState<number>(1);
@@ -186,22 +184,12 @@ const Index: React.FC = () => {
         />
         <div className="flex gap-4 mt-8">
           {indicators.map((indicator) => (
-            <Card
+            <IndicatorCard
               key={indicator.id}
-              className={`p-4 cursor-pointer transition-all hover:scale-105 ${
-                activeIndicator === indicator.id ? 'ring-2 ring-primary' : ''
-              }`}
+              indicator={indicator}
+              isActive={activeIndicator === indicator.id}
               onClick={() => setActiveIndicator(indicator.id)}
-            >
-              <div className="w-20 h-20 relative">
-                <img 
-                  src={indicator.centerImage} 
-                  alt={`Indicator ${indicator.id}`}
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <p className="text-center mt-2">Indicator {indicator.id}</p>
-            </Card>
+            />
           ))}
         </div>
       </div>
@@ -209,97 +197,21 @@ const Index: React.FC = () => {
         <ScrollArea className="h-full">
           <div className="p-8">
             <div className="flex flex-col gap-6">
-              <div className="flex flex-col gap-4 p-4 border rounded-lg bg-white">
-                <h2 className="text-lg font-semibold">Theme Configuration</h2>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">Number of Themes:</span>
-                    <Input
-                      type="number"
-                      min="1"
-                      max="10"
-                      value={globalConfig.themeCount}
-                      onChange={(e) => updateGlobalConfig(Number(e.target.value))}
-                      className="w-20"
-                    />
-                  </div>
-                </div>
-                {globalConfig.groups.map((theme, themeIndex) => (
-                  <div key={themeIndex} className="flex flex-col gap-4">
-                    <div className="flex items-center gap-4">
-                      <span className="text-sm font-medium min-w-[100px]">{theme.label}</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm">Slice Color:</span>
-                        <input
-                          type="color"
-                          value={theme.color}
-                          onChange={(e) => updateThemeConfig(themeIndex, e.target.value)}
-                          className="w-8 h-8 !p-0 rounded-md overflow-hidden"
-                        />
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm">Ranking Color:</span>
-                        <input
-                          type="color"
-                          value={theme.rankingColor}
-                          onChange={(e) => updateThemeConfig(themeIndex, undefined, e.target.value)}
-                          className="w-8 h-8 !p-0 rounded-md overflow-hidden"
-                        />
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm">Slices:</span>
-                        <Input
-                          type="number"
-                          min="1"
-                          max="20"
-                          value={theme.sliceCount}
-                          onChange={(e) => updateThemeConfig(themeIndex, undefined, undefined, Number(e.target.value))}
-                          className="w-20"
-                        />
-                      </div>
-                    </div>
-                    <div className="border-b border-gray-200 opacity-30" />
-                  </div>
-                ))}
-              </div>
+              <ThemeConfiguration
+                globalConfig={globalConfig}
+                onUpdateGlobalConfig={updateGlobalConfig}
+                onUpdateThemeConfig={updateThemeConfig}
+              />
               
               <div className="border-b border-gray-200 opacity-30" />
               
-              <div className="flex flex-col gap-4 p-4 border rounded-lg bg-white">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold">Indicator {activeIndicator}</h2>
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleImageUpload}
-                    accept="image/*"
-                    className="hidden"
-                  />
-                  <Button 
-                    onClick={() => fileInputRef.current?.click()}
-                    variant="outline"
-                  >
-                    Replace illustration
-                  </Button>
-                </div>
-                {activeIndicatorData.groups.map((group, groupIndex) => (
-                  <div key={groupIndex} className="grid grid-cols-2 gap-4">
-                    {group.slices.map((slice, sliceIndex) => (
-                      <div key={`${groupIndex}-${sliceIndex}`} className="flex items-center gap-2">
-                        <span className="text-sm">{group.label} - Slice {sliceIndex + 1}:</span>
-                        <Input
-                          type="number"
-                          min="0"
-                          max="5"
-                          value={slice.progress}
-                          onChange={(e) => updateSliceProgress(groupIndex, sliceIndex, Number(e.target.value))}
-                          className="w-20"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                ))}
-              </div>
+              <IndicatorControls
+                activeIndicator={activeIndicator}
+                indicator={activeIndicatorData}
+                onUpdateProgress={updateSliceProgress}
+                onImageUpload={handleImageUpload}
+                fileInputRef={fileInputRef}
+              />
             </div>
           </div>
         </ScrollArea>
