@@ -8,16 +8,30 @@ interface Slice {
   label: string;
 }
 
-const generateSlices = (count: number): Slice[] => {
-  return Array.from({ length: count }, (_, i) => ({
+interface Group {
+  slices: Slice[];
+  label: string;
+}
+
+const generateGroup = (sliceCount: number): Group => ({
+  label: `Group`,
+  slices: Array.from({ length: sliceCount }, (_, i) => ({
     color: '#E2E2E2',
     label: `Slice ${i + 1}`
+  }))
+});
+
+const generateGroups = (groupCount: number, slicesPerGroup: number): Group[] => {
+  return Array.from({ length: groupCount }, (_, i) => ({
+    ...generateGroup(slicesPerGroup),
+    label: `Group ${i + 1}`
   }));
 };
 
 export const CircleDiagram: React.FC = () => {
-  const [sliceCount, setSliceCount] = useState<number>(22);
-  const [slices, setSlices] = useState<Slice[]>(generateSlices(22));
+  const [groupCount, setGroupCount] = useState<number>(3);
+  const [slicesPerGroup, setSlicesPerGroup] = useState<number>(7);
+  const [groups, setGroups] = useState<Group[]>(generateGroups(3, 7));
   const [centerImage, setCenterImage] = useState<string>("/lovable-uploads/ad390dfb-65ef-43f9-a728-84385f728052.png");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -26,9 +40,10 @@ export const CircleDiagram: React.FC = () => {
   const svgSize = outerRadius * 2 + 100;
   const gapAngle = (Math.PI / 180) * 1; // 1 degree gap
 
-  const updateSlices = (count: number) => {
-    setSliceCount(count);
-    setSlices(generateSlices(count));
+  const updateGroups = (newGroupCount: number, newSlicesPerGroup: number) => {
+    setGroupCount(newGroupCount);
+    setSlicesPerGroup(newSlicesPerGroup);
+    setGroups(generateGroups(newGroupCount, newSlicesPerGroup));
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,11 +57,12 @@ export const CircleDiagram: React.FC = () => {
     }
   };
 
-  const createSlicePath = (index: number, total: number) => {
-    const totalGapAngle = gapAngle * total;
+  const createSlicePath = (sliceIndex: number, groupIndex: number, totalSlices: number) => {
+    const totalGapAngle = gapAngle * totalSlices;
     const availableAngle = 2 * Math.PI - totalGapAngle;
-    const sliceAngle = availableAngle / total;
-    const startAngle = index * (sliceAngle + gapAngle);
+    const sliceAngle = availableAngle / totalSlices;
+    const absoluteSliceIndex = groups.slice(0, groupIndex).reduce((acc, group) => acc + group.slices.length, 0) + sliceIndex;
+    const startAngle = absoluteSliceIndex * (sliceAngle + gapAngle);
     const endAngle = startAngle + sliceAngle;
 
     const startOuterX = outerRadius + Math.cos(startAngle) * outerRadius;
@@ -69,18 +85,36 @@ export const CircleDiagram: React.FC = () => {
     `;
   };
 
+  const totalSlices = groups.reduce((acc, group) => acc + group.slices.length, 0);
+
   return (
     <div className="flex flex-col items-center gap-8 p-8">
       <div className="flex items-center gap-4">
-        <Input
-          type="number"
-          min="1"
-          max="50"
-          value={sliceCount}
-          onChange={(e) => updateSlices(Number(e.target.value))}
-          className="w-24"
-        />
-        <Button onClick={() => updateSlices(sliceCount)}>Update Slices</Button>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium">Groups:</span>
+          <Input
+            type="number"
+            min="1"
+            max="10"
+            value={groupCount}
+            onChange={(e) => updateGroups(Number(e.target.value), slicesPerGroup)}
+            className="w-20"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium">Slices per group:</span>
+          <Input
+            type="number"
+            min="1"
+            max="20"
+            value={slicesPerGroup}
+            onChange={(e) => updateGroups(groupCount, Number(e.target.value))}
+            className="w-20"
+          />
+        </div>
+        <Button onClick={() => updateGroups(groupCount, slicesPerGroup)}>
+          Update Groups
+        </Button>
       </div>
       
       <div className="flex items-center gap-4">
@@ -134,12 +168,14 @@ export const CircleDiagram: React.FC = () => {
         />
         
         {/* Outer circle slices */}
-        {slices.map((slice, index) => (
-          <path
-            key={index}
-            d={createSlicePath(index, slices.length)}
-            fill={slice.color}
-          />
+        {groups.map((group, groupIndex) => (
+          group.slices.map((slice, sliceIndex) => (
+            <path
+              key={`${groupIndex}-${sliceIndex}`}
+              d={createSlicePath(sliceIndex, groupIndex, totalSlices)}
+              fill={slice.color}
+            />
+          ))
         ))}
       </svg>
     </div>
