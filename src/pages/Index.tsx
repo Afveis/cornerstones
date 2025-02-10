@@ -11,7 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 const Index: React.FC = () => {
   const [groupCount, setGroupCount] = React.useState<number>(3);
   const [groups, setGroups] = React.useState<Group[]>(generateGroups(3));
-  const [centerImage, setCenterImage] = React.useState<string>("/lovable-uploads/ad390dfb-65ef-43f9-a728-84385f728052.png");
+  const [centerImage, setCenterImage] = React.useState<string>("/lovable-uploads/72ca0fbe-0ce5-4bbe-86ee-8cd55cbf0521.png");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const updateGroupCount = (newGroupCount: number) => {
