@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,7 +49,7 @@ export const CircleDiagram: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const centerRadius = 150;
-  const middleRadius = 192; // Changed from 180 to 192
+  const middleRadius = 180;
   const outerRadius = 300;
   const progressStep = 24;
   const svgSize = outerRadius * 2 + 100;
@@ -109,7 +108,7 @@ export const CircleDiagram: React.FC = () => {
   };
 
   const createProgressCirclePath = (sliceIndex: number, groupIndex: number, totalSlices: number, progressLevel: number) => {
-    const progressRadius = middleRadius + ((progressLevel - 1) * progressStep);
+    const progressRadius = 192 + ((progressLevel - 1) * progressStep);
     const availableAngle = 2 * Math.PI;
     const sliceAngle = availableAngle / totalSlices;
     const absoluteSliceIndex = groups.slice(0, groupIndex).reduce((acc, group) => acc + group.slices.length, 0) + sliceIndex;
