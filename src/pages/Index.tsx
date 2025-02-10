@@ -11,6 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 const Index: React.FC = () => {
   const [groupCount, setGroupCount] = React.useState<number>(3);
   const [groups, setGroups] = React.useState<Group[]>(generateGroups(3));
+  const [centerImage, setCenterImage] = React.useState<string>("/lovable-uploads/ad390dfb-65ef-43f9-a728-84385f728052.png");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const updateGroupCount = (newGroupCount: number) => {
@@ -66,6 +67,19 @@ const Index: React.FC = () => {
     });
   };
 
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          setCenterImage(e.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <main className="flex min-h-screen">
       <div className="flex-1 bg-white fixed left-0 right-[600px] top-0 bottom-0 flex items-center justify-center">
@@ -75,6 +89,7 @@ const Index: React.FC = () => {
           onUpdateGroupCount={updateGroupCount}
           onUpdateGroupConfig={updateGroupConfig}
           onUpdateProgress={updateSliceProgress}
+          centerImage={centerImage}
         />
       </div>
       <div className="w-[600px] fixed right-0 top-0 bottom-0 bg-[#F3F3F3]">
@@ -93,6 +108,13 @@ const Index: React.FC = () => {
                     className="w-20"
                   />
                 </div>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleImageUpload}
+                  accept="image/*"
+                  className="hidden"
+                />
                 <Button 
                   onClick={() => fileInputRef.current?.click()}
                   variant="outline"

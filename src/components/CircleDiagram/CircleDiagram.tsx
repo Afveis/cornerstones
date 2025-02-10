@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from "react";
+import React from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Group } from './types';
 import { PathGenerators } from './PathGenerators';
@@ -12,15 +12,14 @@ interface CircleDiagramProps {
   onUpdateGroupCount: (count: number) => void;
   onUpdateGroupConfig: (groupIndex: number, color?: string, rankingColor?: string, sliceCount?: number) => void;
   onUpdateProgress: (groupIndex: number, sliceIndex: number, progress: number) => void;
+  centerImage: string;
 }
 
 export const CircleDiagram: React.FC<CircleDiagramProps> = ({
   groups,
   groupCount,
+  centerImage,
 }) => {
-  const [centerImage, setCenterImage] = useState<string>("/lovable-uploads/ad390dfb-65ef-43f9-a728-84385f728052.png");
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
   const config = {
     centerRadius: 150,
     middleRadius: 180,
@@ -39,27 +38,8 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
 
   const pathGenerators = new PathGenerators(config, totalSlices, slicesBeforeGroup);
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setCenterImage(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   return (
     <div className="flex flex-col items-center">
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleImageUpload}
-        accept="image/*"
-        className="hidden"
-      />
-      
       <TooltipProvider>
         <svg width={config.svgSize} height={config.svgSize} viewBox={`0 0 ${config.svgSize} ${config.svgSize}`}>
           <CircleDefinitions
