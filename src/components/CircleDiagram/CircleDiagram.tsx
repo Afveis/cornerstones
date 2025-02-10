@@ -54,7 +54,7 @@ export const CircleDiagram: React.FC = () => {
   const progressStep = 24;
   const svgSize = outerRadius * 2 + 100;
   const strokeWidth = 4;
-  const rankingStrokeWidth = 24; // New stroke width for ranking circles
+  const rankingStrokeWidth = 24;
 
   const createMiddleCirclePath = (groupIndex: number, totalGroups: number) => {
     const availableAngle = 2 * Math.PI;
@@ -108,7 +108,7 @@ export const CircleDiagram: React.FC = () => {
   };
 
   const createProgressCirclePath = (sliceIndex: number, groupIndex: number, totalSlices: number, progressLevel: number) => {
-    const progressRadius = middleRadius + (progressLevel * progressStep);
+    const progressRadius = middleRadius + ((progressLevel - 1) * progressStep);
     const availableAngle = 2 * Math.PI;
     const sliceAngle = availableAngle / totalSlices;
     const absoluteSliceIndex = groups.slice(0, groupIndex).reduce((acc, group) => acc + group.slices.length, 0) + sliceIndex;
