@@ -1,13 +1,11 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import React from "react";
+import { WelcomeHero } from "@/components/welcome/WelcomeHero";
 
-const Index = () => {
+const Index: React.FC = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <main className="bg-white flex max-w-[976px] flex-col overflow-hidden items-center text-[8px] text-white font-medium whitespace-nowrap justify-center px-20 py-[117px] max-md:px-5 max-md:py-[100px]">
+      <WelcomeHero />
+    </main>
   );
 };
 
