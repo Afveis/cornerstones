@@ -26,7 +26,7 @@ export const GroupControls: React.FC<GroupControlsProps> = ({
             type="color"
             value={group.color}
             onChange={(e) => onUpdateConfig(groupIndex, e.target.value, undefined)}
-            className="w-8 h-8 rounded-full overflow-hidden cursor-pointer"
+            className="w-14 h-8"
           />
         </div>
         <div className="flex items-center gap-2">
@@ -35,7 +35,7 @@ export const GroupControls: React.FC<GroupControlsProps> = ({
             type="color"
             value={group.rankingColor}
             onChange={(e) => onUpdateConfig(groupIndex, undefined, e.target.value)}
-            className="w-8 h-8 rounded-full overflow-hidden cursor-pointer"
+            className="w-14 h-8"
           />
         </div>
         <div className="flex items-center gap-2">
