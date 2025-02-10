@@ -68,7 +68,7 @@ const Index: React.FC = () => {
 
   return (
     <main className="flex min-h-screen">
-      <div className="flex-1 bg-white p-8 flex items-center justify-center fixed left-0 right-[600px]">
+      <div className="flex-1 bg-white fixed left-0 right-[600px] top-0 bottom-0 flex items-center justify-center">
         <CircleDiagram 
           groups={groups}
           groupCount={groupCount}
