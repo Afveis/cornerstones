@@ -1,3 +1,4 @@
+
 import React, { useRef, useState } from "react";
 import { CircleDiagram } from "@/components/CircleDiagram/CircleDiagram";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -16,11 +17,11 @@ const Index: React.FC = () => {
   });
   
   const [indicators, setIndicators] = useState<Indicator[]>([
-    { id: 1, centerImage: "/lovable-uploads/72ca0fbe-0ce5-4bbe-86ee-8cd55cbf0521.png", groups: JSON.parse(JSON.stringify(globalConfig.groups)) },
-    { id: 2, centerImage: "/lovable-uploads/72ca0fbe-0ce5-4bbe-86ee-8cd55cbf0521.png", groups: JSON.parse(JSON.stringify(globalConfig.groups)) },
-    { id: 3, centerImage: "/lovable-uploads/72ca0fbe-0ce5-4bbe-86ee-8cd55cbf0521.png", groups: JSON.parse(JSON.stringify(globalConfig.groups)) },
-    { id: 4, centerImage: "/lovable-uploads/72ca0fbe-0ce5-4bbe-86ee-8cd55cbf0521.png", groups: JSON.parse(JSON.stringify(globalConfig.groups)) },
-    { id: 5, centerImage: "/lovable-uploads/72ca0fbe-0ce5-4bbe-86ee-8cd55cbf0521.png", groups: JSON.parse(JSON.stringify(globalConfig.groups)) },
+    { id: 1, centerImage: "/lovable-uploads/3fbd1296-a4d4-4f64-a3c3-d480231aca1a.png", groups: JSON.parse(JSON.stringify(globalConfig.groups)) },
+    { id: 2, centerImage: "/lovable-uploads/1364c0b0-371e-468f-a8d7-baa93089c1a7.png", groups: JSON.parse(JSON.stringify(globalConfig.groups)) },
+    { id: 3, centerImage: "/lovable-uploads/8cec5b95-3fc0-4810-aeb5-ba181501df06.png", groups: JSON.parse(JSON.stringify(globalConfig.groups)) },
+    { id: 4, centerImage: "/lovable-uploads/3b4add13-7d48-4922-bacc-6f8fbd6523f4.png", groups: JSON.parse(JSON.stringify(globalConfig.groups)) },
+    { id: 5, centerImage: "/lovable-uploads/dd6e8427-ee8e-4177-96da-27645ccd1d82.png", groups: JSON.parse(JSON.stringify(globalConfig.groups)) },
   ]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
