@@ -1,29 +1,32 @@
-
 import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 interface Slice {
   color: string;
+  rankingColor: string; // New property for ranking circles color
   label: string;
-  progress: number; // 0-5 ranking
+  progress: number;
 }
 
 interface Group {
   slices: Slice[];
   label: string;
   color: string;
+  rankingColor: string; // New property for ranking circles color
   sliceCount: number;
 }
 
-const generateGroup = (sliceCount: number, color: string = '#E2E2E2'): Group => ({
+const generateGroup = (sliceCount: number, color: string = '#E2E2E2', rankingColor: string = '#8B5CF6'): Group => ({
   label: `Group`,
   slices: Array.from({ length: sliceCount }, (_, i) => ({
     color,
+    rankingColor,
     label: `Slice ${i + 1}`,
     progress: 0
   })),
   color,
+  rankingColor,
   sliceCount
 });
 
@@ -48,7 +51,7 @@ export const CircleDiagram: React.FC = () => {
   const centerRadius = 150;
   const middleRadius = 180;
   const outerRadius = 300;
-  const progressStep = 24; // Each progress level adds 24px
+  const progressStep = 24;
   const svgSize = outerRadius * 2 + 100;
   const strokeWidth = 4;
 
@@ -131,19 +134,32 @@ export const CircleDiagram: React.FC = () => {
     setGroups(prevGroups => generateGroups(newGroupCount, prevGroups));
   };
 
-  const updateGroupConfig = (groupIndex: number, color?: string, sliceCount?: number) => {
+  const updateGroupConfig = (groupIndex: number, color?: string, rankingColor?: string, sliceCount?: number) => {
     setGroups(prevGroups => {
       const newGroups = [...prevGroups];
       const currentGroup = { ...newGroups[groupIndex] };
       
       if (color !== undefined) {
         currentGroup.color = color;
+        currentGroup.slices = currentGroup.slices.map(slice => ({
+          ...slice,
+          color
+        }));
+      }
+
+      if (rankingColor !== undefined) {
+        currentGroup.rankingColor = rankingColor;
+        currentGroup.slices = currentGroup.slices.map(slice => ({
+          ...slice,
+          rankingColor
+        }));
       }
       
       if (sliceCount !== undefined) {
         currentGroup.sliceCount = sliceCount;
         currentGroup.slices = Array.from({ length: sliceCount }, (_, i) => ({
           color: currentGroup.color,
+          rankingColor: currentGroup.rankingColor,
           label: `Slice ${i + 1}`,
           progress: 0
         }));
@@ -159,7 +175,7 @@ export const CircleDiagram: React.FC = () => {
       const newGroups = [...prevGroups];
       const currentGroup = { ...newGroups[groupIndex] };
       const currentSlice = { ...currentGroup.slices[sliceIndex] };
-      currentSlice.progress = Math.max(0, Math.min(5, progress)); // Clamp between 0 and 5
+      currentSlice.progress = Math.max(0, Math.min(5, progress));
       currentGroup.slices[sliceIndex] = currentSlice;
       newGroups[groupIndex] = currentGroup;
       return newGroups;
@@ -199,11 +215,20 @@ export const CircleDiagram: React.FC = () => {
             <div className="flex items-center gap-4">
               <span className="text-sm font-medium min-w-[100px]">{group.label}</span>
               <div className="flex items-center gap-2">
-                <span className="text-sm">Color:</span>
+                <span className="text-sm">Slice Color:</span>
                 <input
                   type="color"
                   value={group.color}
-                  onChange={(e) => updateGroupConfig(groupIndex, e.target.value)}
+                  onChange={(e) => updateGroupConfig(groupIndex, e.target.value, undefined)}
+                  className="w-14 h-8"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm">Ranking Color:</span>
+                <input
+                  type="color"
+                  value={group.rankingColor}
+                  onChange={(e) => updateGroupConfig(groupIndex, undefined, e.target.value)}
                   className="w-14 h-8"
                 />
               </div>
@@ -214,7 +239,7 @@ export const CircleDiagram: React.FC = () => {
                   min="1"
                   max="20"
                   value={group.sliceCount}
-                  onChange={(e) => updateGroupConfig(groupIndex, undefined, Number(e.target.value))}
+                  onChange={(e) => updateGroupConfig(groupIndex, undefined, undefined, Number(e.target.value))}
                   className="w-20"
                 />
               </div>
@@ -300,7 +325,7 @@ export const CircleDiagram: React.FC = () => {
                 <path
                   key={`progress-${groupIndex}-${sliceIndex}-${i}`}
                   d={createProgressCirclePath(sliceIndex, groupIndex, totalSlices, i + 1)}
-                  stroke={group.color}
+                  stroke={group.rankingColor}
                   strokeWidth={strokeWidth}
                   fill="none"
                   clipPath={`url(#slice-clip-${groupIndex}-${sliceIndex})`}
@@ -344,4 +369,3 @@ export const CircleDiagram: React.FC = () => {
     </div>
   );
 };
-
