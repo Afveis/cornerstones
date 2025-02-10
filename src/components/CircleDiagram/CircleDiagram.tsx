@@ -1,10 +1,11 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Group } from './types';
 import { PathGenerators } from './PathGenerators';
 import { CircleSlice } from './components/CircleSlice';
 import { CircleDefinitions } from './components/CircleDefinitions';
+import { Button } from "@/components/ui/button";
 
 interface CircleDiagramProps {
   groups: Group[];
@@ -20,6 +21,8 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
   groupCount,
   centerImage,
 }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
   const config = {
     centerRadius: 150,
     middleRadius: 180,
@@ -38,7 +41,7 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
 
   const pathGenerators = new PathGenerators(config, totalSlices, slicesBeforeGroup);
 
-  const handleMiddleCircleClick = () => {
+  const handleCenterCircleClick = () => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
@@ -48,7 +51,6 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
         const reader = new FileReader();
         reader.onload = (e) => {
           if (e.target?.result) {
-            // Since we can't directly update the centerImage prop, we trigger the file input click
             const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
             const changeEvent = new Event('change', { bubbles: true });
             Object.defineProperty(changeEvent, 'target', { value: { files: [file] } });
@@ -94,30 +96,56 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
               fill={group.color}
               stroke="white"
               strokeWidth={config.strokeWidth}
-              className="cursor-pointer hover:opacity-80 transition-opacity"
-              onClick={handleMiddleCircleClick}
+              className="transition-opacity"
             />
           ))}
           
-          {/* White center circle with shadow */}
-          <circle
-            cx={config.outerRadius}
-            cy={config.outerRadius}
-            r={config.centerRadius}
-            fill="white"
-            stroke="#E5E7EB"
-            filter="url(#centerShadow)"
-          />
-          
-          <image
-            x={config.outerRadius - config.centerRadius + 20}
-            y={config.outerRadius - config.centerRadius + 20}
-            width={config.centerRadius * 2 - 40}
-            height={config.centerRadius * 2 - 40}
-            href={centerImage}
-            preserveAspectRatio="xMidYMid meet"
-            clipPath="url(#centerCircleClip)"
-          />
+          {/* White center circle with shadow and hover effect */}
+          <g 
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            onClick={handleCenterCircleClick}
+            style={{ cursor: 'pointer' }}
+          >
+            <circle
+              cx={config.outerRadius}
+              cy={config.outerRadius}
+              r={config.centerRadius}
+              fill="white"
+              stroke="#E5E7EB"
+              filter="url(#centerShadow)"
+              className="transition-opacity"
+              style={{ opacity: isHovered ? 0.9 : 1 }}
+            />
+            
+            <image
+              x={config.outerRadius - config.centerRadius + 20}
+              y={config.outerRadius - config.centerRadius + 20}
+              width={config.centerRadius * 2 - 40}
+              height={config.centerRadius * 2 - 40}
+              href={centerImage}
+              preserveAspectRatio="xMidYMid meet"
+              clipPath="url(#centerCircleClip)"
+              className="transition-opacity"
+              style={{ opacity: isHovered ? 0.7 : 1 }}
+            />
+
+            {isHovered && (
+              <foreignObject
+                x={config.outerRadius - 60}
+                y={config.outerRadius - 20}
+                width={120}
+                height={40}
+              >
+                <Button 
+                  className="w-full bg-white/80 hover:bg-white text-black border border-gray-200"
+                  onClick={handleCenterCircleClick}
+                >
+                  Replace Image
+                </Button>
+              </foreignObject>
+            )}
+          </g>
         </svg>
       </TooltipProvider>
     </div>
