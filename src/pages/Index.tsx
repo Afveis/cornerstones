@@ -1,3 +1,4 @@
+
 import React, { useRef, useState } from "react";
 import { CircleDiagram } from "@/components/CircleDiagram/CircleDiagram";
 import { Button } from "@/components/ui/button";
@@ -17,11 +18,11 @@ const Index: React.FC = () => {
   });
   
   const [indicators, setIndicators] = useState<Indicator[]>([
-    { id: 1, centerImage: "/lovable-uploads/72ca0fbe-0ce5-4bbe-86ee-8cd55cbf0521.png", groups: globalConfig.groups },
-    { id: 2, centerImage: "/lovable-uploads/72ca0fbe-0ce5-4bbe-86ee-8cd55cbf0521.png", groups: globalConfig.groups },
-    { id: 3, centerImage: "/lovable-uploads/72ca0fbe-0ce5-4bbe-86ee-8cd55cbf0521.png", groups: globalConfig.groups },
-    { id: 4, centerImage: "/lovable-uploads/72ca0fbe-0ce5-4bbe-86ee-8cd55cbf0521.png", groups: globalConfig.groups },
-    { id: 5, centerImage: "/lovable-uploads/72ca0fbe-0ce5-4bbe-86ee-8cd55cbf0521.png", groups: globalConfig.groups },
+    { id: 1, centerImage: "/lovable-uploads/72ca0fbe-0ce5-4bbe-86ee-8cd55cbf0521.png", groups: JSON.parse(JSON.stringify(globalConfig.groups)) },
+    { id: 2, centerImage: "/lovable-uploads/72ca0fbe-0ce5-4bbe-86ee-8cd55cbf0521.png", groups: JSON.parse(JSON.stringify(globalConfig.groups)) },
+    { id: 3, centerImage: "/lovable-uploads/72ca0fbe-0ce5-4bbe-86ee-8cd55cbf0521.png", groups: JSON.parse(JSON.stringify(globalConfig.groups)) },
+    { id: 4, centerImage: "/lovable-uploads/72ca0fbe-0ce5-4bbe-86ee-8cd55cbf0521.png", groups: JSON.parse(JSON.stringify(globalConfig.groups)) },
+    { id: 5, centerImage: "/lovable-uploads/72ca0fbe-0ce5-4bbe-86ee-8cd55cbf0521.png", groups: JSON.parse(JSON.stringify(globalConfig.groups)) },
   ]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -41,12 +42,21 @@ const Index: React.FC = () => {
         }));
       });
       
-      // Update all indicators with new global groups
+      // Update all indicators with new global groups, but preserve their progress values
       setIndicators(prevIndicators => 
-        prevIndicators.map(indicator => ({
-          ...indicator,
-          groups: [...groups]
-        }))
+        prevIndicators.map(indicator => {
+          const newGroups = groups.map((group, groupIndex) => ({
+            ...group,
+            slices: group.slices.map((slice, sliceIndex) => ({
+              ...slice,
+              progress: indicator.groups[groupIndex]?.slices[sliceIndex]?.progress || 0
+            }))
+          }));
+          return {
+            ...indicator,
+            groups: newGroups
+          };
+        })
       );
 
       return {
@@ -80,11 +90,17 @@ const Index: React.FC = () => {
       
       newGroups[themeIndex] = currentTheme;
 
-      // Update all indicators with new theme colors
+      // Update all indicators with new theme colors while preserving progress
       setIndicators(prevIndicators => 
         prevIndicators.map(indicator => ({
           ...indicator,
-          groups: newGroups
+          groups: newGroups.map((group, groupIndex) => ({
+            ...group,
+            slices: group.slices.map((slice, sliceIndex) => ({
+              ...slice,
+              progress: indicator.groups[groupIndex].slices[sliceIndex].progress
+            }))
+          }))
         }))
       );
 
@@ -99,12 +115,24 @@ const Index: React.FC = () => {
     setIndicators(prevIndicators => {
       return prevIndicators.map(indicator => {
         if (indicator.id === activeIndicator) {
-          const newGroups = [...indicator.groups];
-          const currentTheme = { ...newGroups[themeIndex] };
-          const currentSlice = { ...currentTheme.slices[sliceIndex] };
-          currentSlice.progress = Math.max(0, Math.min(5, progress));
-          currentTheme.slices[sliceIndex] = currentSlice;
-          newGroups[themeIndex] = currentTheme;
+          const newGroups = indicator.groups.map((group, gIndex) => {
+            if (gIndex === themeIndex) {
+              return {
+                ...group,
+                slices: group.slices.map((slice, sIndex) => {
+                  if (sIndex === sliceIndex) {
+                    return {
+                      ...slice,
+                      progress: Math.max(0, Math.min(5, progress))
+                    };
+                  }
+                  return slice;
+                })
+              };
+            }
+            return group;
+          });
+          
           return {
             ...indicator,
             groups: newGroups
