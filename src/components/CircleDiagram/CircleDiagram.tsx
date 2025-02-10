@@ -55,7 +55,8 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
 
   const pathGenerators = new PathGenerators(config, totalSlices, slicesBeforeGroup);
 
-  const handleCenterCircleClick = () => {
+  const handleCenterCircleClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent event bubbling
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
@@ -120,7 +121,6 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
           <g 
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
-            onClick={handleCenterCircleClick}
             style={{ cursor: 'pointer' }}
           >
             <circle
