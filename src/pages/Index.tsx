@@ -50,31 +50,48 @@ const Index: React.FC = () => {
     setGlobalConfig(prev => {
       const themeCount = newThemeCount ?? prev.themeCount;
       const sliceCount = newSliceCount ?? prev.sliceCount;
-      const groups = generateGroups(themeCount);
-      groups.forEach(group => {
-        group.sliceCount = sliceCount;
-        group.slices = Array.from({ length: sliceCount }, (_, i) => ({
-          color: group.color,
-          rankingColor: group.rankingColor,
-          label: `Slice ${i + 1}`,
-          progress: 0
+      let groups: Group[];
+
+      if (newThemeCount !== undefined) {
+        // If theme count is changing, preserve existing theme settings
+        if (newThemeCount > prev.groups.length) {
+          // Adding new themes
+          const existingGroups = [...prev.groups];
+          const newGroups = generateGroups(newThemeCount - prev.groups.length);
+          groups = [...existingGroups, ...newGroups];
+        } else {
+          // Reducing number of themes
+          groups = prev.groups.slice(0, newThemeCount);
+        }
+      } else {
+        groups = prev.groups;
+      }
+
+      // Update slice count if needed
+      if (newSliceCount !== undefined) {
+        groups = groups.map(group => ({
+          ...group,
+          sliceCount: newSliceCount,
+          slices: Array.from({ length: newSliceCount }, (_, i) => ({
+            color: group.color,
+            rankingColor: group.rankingColor,
+            label: `Slice ${i + 1}`,
+            progress: 0
+          }))
         }));
-      });
+      }
       
       setIndicators(prevIndicators => 
-        prevIndicators.map(indicator => {
-          const newGroups = groups.map((group, groupIndex) => ({
+        prevIndicators.map(indicator => ({
+          ...indicator,
+          groups: groups.map((group, groupIndex) => ({
             ...group,
             slices: group.slices.map((slice, sliceIndex) => ({
               ...slice,
               progress: indicator.groups[groupIndex]?.slices[sliceIndex]?.progress || 0
             }))
-          }));
-          return {
-            ...indicator,
-            groups: newGroups
-          };
-        })
+          }))
+        }))
       );
 
       return {
@@ -242,3 +259,4 @@ const Index: React.FC = () => {
 };
 
 export default Index;
+
