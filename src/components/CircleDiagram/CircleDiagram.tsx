@@ -11,27 +11,30 @@ interface Slice {
 interface Group {
   slices: Slice[];
   label: string;
+  color: string;
+  sliceCount: number;
 }
 
-const generateGroup = (sliceCount: number): Group => ({
+const generateGroup = (sliceCount: number, color: string = '#E2E2E2'): Group => ({
   label: `Group`,
   slices: Array.from({ length: sliceCount }, (_, i) => ({
-    color: '#E2E2E2',
+    color,
     label: `Slice ${i + 1}`
-  }))
+  })),
+  color,
+  sliceCount
 });
 
-const generateGroups = (groupCount: number, slicesPerGroup: number): Group[] => {
+const generateGroups = (groupCount: number): Group[] => {
   return Array.from({ length: groupCount }, (_, i) => ({
-    ...generateGroup(slicesPerGroup),
+    ...generateGroup(7),
     label: `Group ${i + 1}`
   }));
 };
 
 export const CircleDiagram: React.FC = () => {
   const [groupCount, setGroupCount] = useState<number>(3);
-  const [slicesPerGroup, setSlicesPerGroup] = useState<number>(7);
-  const [groups, setGroups] = useState<Group[]>(generateGroups(3, 7));
+  const [groups, setGroups] = useState<Group[]>(generateGroups(3));
   const [centerImage, setCenterImage] = useState<string>("/lovable-uploads/ad390dfb-65ef-43f9-a728-84385f728052.png");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -40,10 +43,31 @@ export const CircleDiagram: React.FC = () => {
   const svgSize = outerRadius * 2 + 100;
   const gapAngle = (Math.PI / 180) * 1; // 1 degree gap
 
-  const updateGroups = (newGroupCount: number, newSlicesPerGroup: number) => {
+  const updateGroupCount = (newGroupCount: number) => {
     setGroupCount(newGroupCount);
-    setSlicesPerGroup(newSlicesPerGroup);
-    setGroups(generateGroups(newGroupCount, newSlicesPerGroup));
+    setGroups(generateGroups(newGroupCount));
+  };
+
+  const updateGroupConfig = (groupIndex: number, color?: string, sliceCount?: number) => {
+    setGroups(prevGroups => {
+      const newGroups = [...prevGroups];
+      const currentGroup = { ...newGroups[groupIndex] };
+      
+      if (color !== undefined) {
+        currentGroup.color = color;
+      }
+      
+      if (sliceCount !== undefined) {
+        currentGroup.sliceCount = sliceCount;
+        currentGroup.slices = Array.from({ length: sliceCount }, (_, i) => ({
+          color: currentGroup.color,
+          label: `Slice ${i + 1}`
+        }));
+      }
+      
+      newGroups[groupIndex] = currentGroup;
+      return newGroups;
+    });
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,30 +115,44 @@ export const CircleDiagram: React.FC = () => {
     <div className="flex flex-col items-center gap-8 p-8">
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">Groups:</span>
+          <span className="text-sm font-medium">Number of Groups:</span>
           <Input
             type="number"
             min="1"
             max="10"
             value={groupCount}
-            onChange={(e) => updateGroups(Number(e.target.value), slicesPerGroup)}
+            onChange={(e) => updateGroupCount(Number(e.target.value))}
             className="w-20"
           />
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">Slices per group:</span>
-          <Input
-            type="number"
-            min="1"
-            max="20"
-            value={slicesPerGroup}
-            onChange={(e) => updateGroups(groupCount, Number(e.target.value))}
-            className="w-20"
-          />
-        </div>
-        <Button onClick={() => updateGroups(groupCount, slicesPerGroup)}>
-          Update Groups
-        </Button>
+      </div>
+
+      <div className="flex flex-col gap-4 w-full max-w-xl">
+        {groups.map((group, index) => (
+          <div key={index} className="flex items-center gap-4 p-4 border rounded-lg">
+            <span className="text-sm font-medium min-w-[100px]">{group.label}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-sm">Color:</span>
+              <input
+                type="color"
+                value={group.color}
+                onChange={(e) => updateGroupConfig(index, e.target.value)}
+                className="w-14 h-8"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm">Slices:</span>
+              <Input
+                type="number"
+                min="1"
+                max="20"
+                value={group.sliceCount}
+                onChange={(e) => updateGroupConfig(index, undefined, Number(e.target.value))}
+                className="w-20"
+              />
+            </div>
+          </div>
+        ))}
       </div>
       
       <div className="flex items-center gap-4">
@@ -173,7 +211,7 @@ export const CircleDiagram: React.FC = () => {
             <path
               key={`${groupIndex}-${sliceIndex}`}
               d={createSlicePath(sliceIndex, groupIndex, totalSlices)}
-              fill={slice.color}
+              fill={group.color}
             />
           ))
         ))}
@@ -181,3 +219,4 @@ export const CircleDiagram: React.FC = () => {
     </div>
   );
 };
+
