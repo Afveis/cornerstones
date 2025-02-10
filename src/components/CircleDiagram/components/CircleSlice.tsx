@@ -1,6 +1,9 @@
 
 import React from 'react';
-import { Tooltip, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Group, Slice } from '../types';
 import { PathGenerators } from '../PathGenerators';
 import { SliceTooltip } from './SliceTooltip';
@@ -28,13 +31,13 @@ export const CircleSlice: React.FC<CircleSliceProps> = ({
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <g>
+        <g className="cursor-pointer">
           <path
             d={pathGenerators.createSlicePath(sliceIndex, groupIndex)}
             fill={group.color}
             stroke="white"
             strokeWidth={config.strokeWidth}
-            className="cursor-pointer hover:opacity-90 transition-opacity"
+            className="hover:opacity-90 transition-opacity"
           />
           {Array.from({ length: slice.progress }, (_, i) => (
             <path
