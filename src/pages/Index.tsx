@@ -1,5 +1,5 @@
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { CircleDiagram } from "@/components/CircleDiagram/CircleDiagram";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Group, Indicator, GlobalConfig } from "@/components/CircleDiagram/types";
@@ -7,13 +7,25 @@ import { generateGroups } from "@/components/CircleDiagram/utils";
 import { ThemeConfiguration } from "@/components/CircleDiagram/ThemeConfiguration";
 import { IndicatorCard } from "@/components/CircleDiagram/IndicatorCard";
 import { IndicatorControls } from "@/components/CircleDiagram/IndicatorControls";
+import { useToast } from "@/components/ui/use-toast";
 
 const Index: React.FC = () => {
+  const { toast } = useToast();
   const [activeIndicator, setActiveIndicator] = useState<number>(1);
-  const [globalConfig, setGlobalConfig] = useState<GlobalConfig>({
-    themeCount: 3,
-    sliceCount: 7,
-    groups: generateGroups(3),
+  const [globalConfig, setGlobalConfig] = useState<GlobalConfig>(() => {
+    const savedConfig = localStorage.getItem('globalConfig');
+    if (savedConfig) {
+      try {
+        return JSON.parse(savedConfig);
+      } catch (e) {
+        console.error('Error parsing saved config:', e);
+      }
+    }
+    return {
+      themeCount: 3,
+      sliceCount: 7,
+      groups: generateGroups(3),
+    };
   });
   
   const [indicators, setIndicators] = useState<Indicator[]>([
@@ -25,6 +37,14 @@ const Index: React.FC = () => {
   ]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    localStorage.setItem('globalConfig', JSON.stringify(globalConfig));
+    toast({
+      title: "Settings saved",
+      description: "Your theme configuration has been saved.",
+    });
+  }, [globalConfig, toast]);
 
   const updateGlobalConfig = (newThemeCount?: number, newSliceCount?: number) => {
     setGlobalConfig(prev => {
