@@ -88,9 +88,15 @@ export const CircleDiagram: React.FC = () => {
   };
 
   const createMiddleCirclePath = (groupIndex: number, totalGroups: number) => {
-    const sliceAngle = (2 * Math.PI) / totalGroups;
-    const startAngle = groupIndex * sliceAngle;
-    const endAngle = startAngle + sliceAngle;
+    const totalGapAngle = gapAngle * totalSlices;
+    const availableAngle = 2 * Math.PI - totalGapAngle;
+    
+    // Calculate the start and end angles based on the slices in previous groups
+    const slicesBeforeGroup = groups.slice(0, groupIndex).reduce((acc, group) => acc + group.slices.length, 0);
+    const groupSlices = groups[groupIndex].slices.length;
+    
+    const startAngle = (slicesBeforeGroup * (availableAngle / totalSlices)) + (slicesBeforeGroup * gapAngle);
+    const endAngle = startAngle + (groupSlices * (availableAngle / totalSlices)) + ((groupSlices - 1) * gapAngle);
 
     const startX = outerRadius + Math.cos(startAngle) * middleRadius;
     const startY = outerRadius + Math.sin(startAngle) * middleRadius;
