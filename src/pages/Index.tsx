@@ -1,4 +1,3 @@
-
 import React, { useRef, useState } from "react";
 import { CircleDiagram } from "@/components/CircleDiagram/CircleDiagram";
 import { Button } from "@/components/ui/button";
@@ -272,7 +271,7 @@ const Index: React.FC = () => {
                   <div key={groupIndex} className="grid grid-cols-2 gap-4">
                     {group.slices.map((slice, sliceIndex) => (
                       <div key={`${groupIndex}-${sliceIndex}`} className="flex items-center gap-2">
-                        <span className="text-sm">{group.label} - Slice {sliceIndex + 1} Progress:</span>
+                        <span className="text-sm">{group.label} - Slice {sliceIndex + 1}:</span>
                         <Input
                           type="number"
                           min="0"
