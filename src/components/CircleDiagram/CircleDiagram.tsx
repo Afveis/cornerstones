@@ -102,13 +102,27 @@ export const CircleDiagram: React.FC = () => {
       </div>
       
       <svg width={svgSize} height={svgSize} viewBox={`0 0 ${svgSize} ${svgSize}`}>
-        {/* White center circle */}
+        {/* Define shadow filter */}
+        <defs>
+          <filter id="centerShadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow 
+              dx="0" 
+              dy="0" 
+              stdDeviation="30" 
+              floodColor="#535353"
+              floodOpacity="0.5"
+            />
+          </filter>
+        </defs>
+        
+        {/* White center circle with shadow */}
         <circle
           cx={outerRadius}
           cy={outerRadius}
           r={centerRadius}
           fill="white"
           stroke="#E5E7EB"
+          filter="url(#centerShadow)"
         />
         
         {/* Center image */}
