@@ -84,7 +84,7 @@ export const CircleSlice: React.FC<CircleSliceProps> = ({
                   <Button
                     size="icon"
                     variant="outline"
-                    className="h-8 w-8 bg-white/80 hover:bg-white"
+                    className="h-8 w-8 rounded-full bg-white/80 hover:bg-white"
                     onClick={(e) => handleProgressChange(false, e)}
                     disabled={slice.progress <= 0}
                     style={{ pointerEvents: 'auto' }}
@@ -94,7 +94,7 @@ export const CircleSlice: React.FC<CircleSliceProps> = ({
                   <Button
                     size="icon"
                     variant="outline"
-                    className="h-8 w-8 bg-white/80 hover:bg-white"
+                    className="h-8 w-8 rounded-full bg-white/80 hover:bg-white"
                     onClick={(e) => handleProgressChange(true, e)}
                     disabled={slice.progress >= 5}
                     style={{ pointerEvents: 'auto' }}
