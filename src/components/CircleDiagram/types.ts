@@ -15,6 +15,12 @@ export interface Group {
   sliceCount: number;
 }
 
+export interface Indicator {
+  id: number;
+  centerImage: string;
+  groups: Group[];
+}
+
 export interface CircleConfig {
   centerRadius: number;
   middleRadius: number;
@@ -23,4 +29,10 @@ export interface CircleConfig {
   svgSize: number;
   strokeWidth: number;
   rankingStrokeWidth: number;
+}
+
+export interface GlobalConfig {
+  themeCount: number;
+  sliceCount: number;
+  groups: Group[];
 }
