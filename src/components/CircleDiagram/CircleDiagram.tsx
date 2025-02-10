@@ -38,6 +38,29 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
 
   const pathGenerators = new PathGenerators(config, totalSlices, slicesBeforeGroup);
 
+  const handleMiddleCircleClick = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (e.target?.result) {
+            // Since we can't directly update the centerImage prop, we trigger the file input click
+            const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+            const changeEvent = new Event('change', { bubbles: true });
+            Object.defineProperty(changeEvent, 'target', { value: { files: [file] } });
+            fileInput?.dispatchEvent(changeEvent);
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    input.click();
+  };
+
   return (
     <div className="flex flex-col items-center">
       <TooltipProvider>
@@ -71,6 +94,8 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
               fill={group.color}
               stroke="white"
               strokeWidth={config.strokeWidth}
+              className="cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={handleMiddleCircleClick}
             />
           ))}
           
