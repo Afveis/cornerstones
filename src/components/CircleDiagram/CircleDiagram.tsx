@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -99,48 +98,14 @@ export const CircleDiagram: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-8 p-8">
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">Number of Groups:</span>
-          <Input
-            type="number"
-            min="1"
-            max="10"
-            value={groupCount}
-            onChange={(e) => updateGroupCount(Number(e.target.value))}
-            className="w-20"
-          />
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-4 w-full max-w-xl">
-        {groups.map((group, groupIndex) => (
-          <GroupControls
-            key={groupIndex}
-            group={group}
-            groupIndex={groupIndex}
-            onUpdateConfig={updateGroupConfig}
-            onUpdateProgress={updateSliceProgress}
-          />
-        ))}
-      </div>
-      
-      <div className="flex items-center gap-4">
-        <input
-          type="file"
-          ref={fileInputRef}
-          onChange={handleImageUpload}
-          accept="image/*"
-          className="hidden"
-        />
-        <Button 
-          onClick={() => fileInputRef.current?.click()}
-          variant="outline"
-        >
-          Choose Center Image
-        </Button>
-      </div>
+    <div className="flex flex-col items-center">
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleImageUpload}
+        accept="image/*"
+        className="hidden"
+      />
       
       <TooltipProvider>
         <svg width={config.svgSize} height={config.svgSize} viewBox={`0 0 ${config.svgSize} ${config.svgSize}`}>
