@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,6 +44,7 @@ export const CircleDiagram: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const centerRadius = 150;
+  const middleRadius = 170;
   const outerRadius = 300;
   const svgSize = outerRadius * 2 + 100;
   const gapAngle = (Math.PI / 180) * 1; // 1 degree gap
@@ -85,6 +87,26 @@ export const CircleDiagram: React.FC = () => {
     }
   };
 
+  const createMiddleCirclePath = (groupIndex: number, totalGroups: number) => {
+    const sliceAngle = (2 * Math.PI) / totalGroups;
+    const startAngle = groupIndex * sliceAngle;
+    const endAngle = startAngle + sliceAngle;
+
+    const startX = outerRadius + Math.cos(startAngle) * middleRadius;
+    const startY = outerRadius + Math.sin(startAngle) * middleRadius;
+    const endX = outerRadius + Math.cos(endAngle) * middleRadius;
+    const endY = outerRadius + Math.sin(endAngle) * middleRadius;
+
+    const largeArcFlag = endAngle - startAngle <= Math.PI ? "0" : "1";
+
+    return `
+      M ${outerRadius} ${outerRadius}
+      L ${startX} ${startY}
+      A ${middleRadius} ${middleRadius} 0 ${largeArcFlag} 1 ${endX} ${endY}
+      Z
+    `;
+  };
+
   const createSlicePath = (sliceIndex: number, groupIndex: number, totalSlices: number) => {
     const totalGapAngle = gapAngle * totalSlices;
     const availableAngle = 2 * Math.PI - totalGapAngle;
@@ -97,10 +119,10 @@ export const CircleDiagram: React.FC = () => {
     const startOuterY = outerRadius + Math.sin(startAngle) * outerRadius;
     const endOuterX = outerRadius + Math.cos(endAngle) * outerRadius;
     const endOuterY = outerRadius + Math.sin(endAngle) * outerRadius;
-    const startInnerX = outerRadius + Math.cos(startAngle) * centerRadius;
-    const startInnerY = outerRadius + Math.sin(startAngle) * centerRadius;
-    const endInnerX = outerRadius + Math.cos(endAngle) * centerRadius;
-    const endInnerY = outerRadius + Math.sin(endAngle) * centerRadius;
+    const startInnerX = outerRadius + Math.cos(startAngle) * middleRadius;
+    const startInnerY = outerRadius + Math.sin(startAngle) * middleRadius;
+    const endInnerX = outerRadius + Math.cos(endAngle) * middleRadius;
+    const endInnerY = outerRadius + Math.sin(endAngle) * middleRadius;
 
     const largeArcFlag = endAngle - startAngle <= Math.PI ? "0" : "1";
 
@@ -108,7 +130,7 @@ export const CircleDiagram: React.FC = () => {
       M ${startOuterX} ${startOuterY}
       A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 1 ${endOuterX} ${endOuterY}
       L ${endInnerX} ${endInnerY}
-      A ${centerRadius} ${centerRadius} 0 ${largeArcFlag} 0 ${startInnerX} ${startInnerY}
+      A ${middleRadius} ${middleRadius} 0 ${largeArcFlag} 0 ${startInnerX} ${startInnerY}
       Z
     `;
   };
@@ -208,6 +230,15 @@ export const CircleDiagram: React.FC = () => {
           href={centerImage}
           preserveAspectRatio="xMidYMid meet"
         />
+
+        {/* Middle circle divided by groups */}
+        {groups.map((group, index) => (
+          <path
+            key={`middle-${index}`}
+            d={createMiddleCirclePath(index, groups.length)}
+            fill={group.color}
+          />
+        ))}
         
         {/* Outer circle slices */}
         {groups.map((group, groupIndex) => (
