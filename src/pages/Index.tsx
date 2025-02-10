@@ -1,3 +1,4 @@
+
 import React, { useRef, useState } from "react";
 import { CircleDiagram } from "@/components/CircleDiagram/CircleDiagram";
 import { Button } from "@/components/ui/button";
@@ -226,25 +227,42 @@ const Index: React.FC = () => {
                   </div>
                 </div>
                 {globalConfig.groups.map((theme, themeIndex) => (
-                  <div key={themeIndex} className="flex items-center gap-4">
-                    <span className="text-sm font-medium min-w-[100px]">{theme.label}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm">Slice Color:</span>
-                      <input
-                        type="color"
-                        value={theme.color}
-                        onChange={(e) => updateThemeConfig(themeIndex, e.target.value)}
-                        className="w-8 h-8 !p-0 rounded-md overflow-hidden"
-                      />
+                  <div key={themeIndex} className="flex flex-col gap-4 p-4 border rounded-lg bg-gray-50">
+                    <div className="flex items-center gap-4">
+                      <span className="text-sm font-medium min-w-[100px]">{theme.label}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">Slice Color:</span>
+                        <input
+                          type="color"
+                          value={theme.color}
+                          onChange={(e) => updateThemeConfig(themeIndex, e.target.value)}
+                          className="w-8 h-8 !p-0 rounded-md overflow-hidden"
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">Ranking Color:</span>
+                        <input
+                          type="color"
+                          value={theme.rankingColor}
+                          onChange={(e) => updateThemeConfig(themeIndex, undefined, e.target.value)}
+                          className="w-8 h-8 !p-0 rounded-md overflow-hidden"
+                        />
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm">Ranking Color:</span>
-                      <input
-                        type="color"
-                        value={theme.rankingColor}
-                        onChange={(e) => updateThemeConfig(themeIndex, undefined, e.target.value)}
-                        className="w-8 h-8 !p-0 rounded-md overflow-hidden"
-                      />
+                    <div className="grid grid-cols-2 gap-4">
+                      {theme.slices.map((slice, sliceIndex) => (
+                        <div key={`${themeIndex}-${sliceIndex}`} className="flex items-center gap-2">
+                          <span className="text-sm">Slice {sliceIndex + 1}:</span>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="5"
+                            value={activeIndicatorData.groups[themeIndex].slices[sliceIndex].progress}
+                            onChange={(e) => updateSliceProgress(themeIndex, sliceIndex, Number(e.target.value))}
+                            className="w-20"
+                          />
+                        </div>
+                      ))}
                     </div>
                   </div>
                 ))}
@@ -269,23 +287,6 @@ const Index: React.FC = () => {
                     Replace illustration
                   </Button>
                 </div>
-                {activeIndicatorData.groups.map((group, groupIndex) => (
-                  <div key={groupIndex} className="grid grid-cols-2 gap-4">
-                    {group.slices.map((slice, sliceIndex) => (
-                      <div key={`${groupIndex}-${sliceIndex}`} className="flex items-center gap-2">
-                        <span className="text-sm">{group.label} - Slice {sliceIndex + 1}:</span>
-                        <Input
-                          type="number"
-                          min="0"
-                          max="5"
-                          value={slice.progress}
-                          onChange={(e) => updateSliceProgress(groupIndex, sliceIndex, Number(e.target.value))}
-                          className="w-20"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                ))}
               </div>
             </div>
           </div>
