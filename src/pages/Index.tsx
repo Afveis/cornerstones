@@ -9,61 +9,61 @@ import { generateGroups } from "@/components/CircleDiagram/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Index: React.FC = () => {
-  const [groupCount, setGroupCount] = React.useState<number>(3);
-  const [groups, setGroups] = React.useState<Group[]>(generateGroups(3));
+  const [themeCount, setThemeCount] = React.useState<number>(3);
+  const [themes, setThemes] = React.useState<Group[]>(generateGroups(3));
   const [centerImage, setCenterImage] = React.useState<string>("/lovable-uploads/72ca0fbe-0ce5-4bbe-86ee-8cd55cbf0521.png");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const updateGroupCount = (newGroupCount: number) => {
-    setGroupCount(newGroupCount);
-    setGroups(prevGroups => generateGroups(newGroupCount, prevGroups));
+  const updateThemeCount = (newThemeCount: number) => {
+    setThemeCount(newThemeCount);
+    setThemes(prevThemes => generateGroups(newThemeCount, prevThemes));
   };
 
-  const updateGroupConfig = (groupIndex: number, color?: string, rankingColor?: string, sliceCount?: number) => {
-    setGroups(prevGroups => {
-      const newGroups = [...prevGroups];
-      const currentGroup = { ...newGroups[groupIndex] };
+  const updateThemeConfig = (themeIndex: number, color?: string, rankingColor?: string, sliceCount?: number) => {
+    setThemes(prevThemes => {
+      const newThemes = [...prevThemes];
+      const currentTheme = { ...newThemes[themeIndex] };
       
       if (color !== undefined) {
-        currentGroup.color = color;
-        currentGroup.slices = currentGroup.slices.map(slice => ({
+        currentTheme.color = color;
+        currentTheme.slices = currentTheme.slices.map(slice => ({
           ...slice,
           color
         }));
       }
 
       if (rankingColor !== undefined) {
-        currentGroup.rankingColor = rankingColor;
-        currentGroup.slices = currentGroup.slices.map(slice => ({
+        currentTheme.rankingColor = rankingColor;
+        currentTheme.slices = currentTheme.slices.map(slice => ({
           ...slice,
           rankingColor
         }));
       }
       
       if (sliceCount !== undefined) {
-        currentGroup.sliceCount = sliceCount;
-        currentGroup.slices = Array.from({ length: sliceCount }, (_, i) => ({
-          color: currentGroup.color,
-          rankingColor: currentGroup.rankingColor,
+        currentTheme.sliceCount = sliceCount;
+        currentTheme.slices = Array.from({ length: sliceCount }, (_, i) => ({
+          color: currentTheme.color,
+          rankingColor: currentTheme.rankingColor,
           label: `Slice ${i + 1}`,
           progress: 0
         }));
       }
       
-      newGroups[groupIndex] = currentGroup;
-      return newGroups;
+      newThemes[themeIndex] = currentTheme;
+      return newThemes;
     });
   };
 
-  const updateSliceProgress = (groupIndex: number, sliceIndex: number, progress: number) => {
-    setGroups(prevGroups => {
-      const newGroups = [...prevGroups];
-      const currentGroup = { ...newGroups[groupIndex] };
-      const currentSlice = { ...currentGroup.slices[sliceIndex] };
+  const updateSliceProgress = (themeIndex: number, sliceIndex: number, progress: number) => {
+    setThemes(prevThemes => {
+      const newThemes = [...prevThemes];
+      const currentTheme = { ...newThemes[themeIndex] };
+      const currentSlice = { ...currentTheme.slices[sliceIndex] };
       currentSlice.progress = Math.max(0, Math.min(5, progress));
-      currentGroup.slices[sliceIndex] = currentSlice;
-      newGroups[groupIndex] = currentGroup;
-      return newGroups;
+      currentTheme.slices[sliceIndex] = currentSlice;
+      newThemes[themeIndex] = currentTheme;
+      return newThemes;
     });
   };
 
@@ -84,10 +84,10 @@ const Index: React.FC = () => {
     <main className="flex min-h-screen">
       <div className="flex-1 bg-white fixed left-0 right-[600px] top-0 bottom-0 flex items-center justify-center">
         <CircleDiagram 
-          groups={groups}
-          groupCount={groupCount}
-          onUpdateGroupCount={updateGroupCount}
-          onUpdateGroupConfig={updateGroupConfig}
+          groups={themes}
+          groupCount={themeCount}
+          onUpdateGroupCount={updateThemeCount}
+          onUpdateGroupConfig={updateThemeConfig}
           onUpdateProgress={updateSliceProgress}
           centerImage={centerImage}
         />
@@ -103,8 +103,8 @@ const Index: React.FC = () => {
                     type="number"
                     min="1"
                     max="10"
-                    value={groupCount}
-                    onChange={(e) => updateGroupCount(Number(e.target.value))}
+                    value={themeCount}
+                    onChange={(e) => updateThemeCount(Number(e.target.value))}
                     className="w-20"
                   />
                 </div>
@@ -122,12 +122,12 @@ const Index: React.FC = () => {
                   Choose Center Image
                 </Button>
               </div>
-              {groups.map((group, groupIndex) => (
+              {themes.map((theme, themeIndex) => (
                 <GroupControls
-                  key={groupIndex}
-                  group={group}
-                  groupIndex={groupIndex}
-                  onUpdateConfig={updateGroupConfig}
+                  key={themeIndex}
+                  group={theme}
+                  groupIndex={themeIndex}
+                  onUpdateConfig={updateThemeConfig}
                   onUpdateProgress={updateSliceProgress}
                 />
               ))}

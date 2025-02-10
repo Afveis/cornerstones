@@ -2,7 +2,7 @@
 import { Group } from './types';
 
 export const generateGroup = (sliceCount: number, color: string = '#E2E2E2', rankingColor: string = '#8B5CF6'): Group => ({
-  label: `Group`,
+  label: `Theme`,
   slices: Array.from({ length: sliceCount }, (_, i) => ({
     color,
     rankingColor,
@@ -15,14 +15,14 @@ export const generateGroup = (sliceCount: number, color: string = '#E2E2E2', ran
   sliceCount
 });
 
-export const generateGroups = (groupCount: number, existingGroups: Group[] = []): Group[] => {
-  return Array.from({ length: groupCount }, (_, i) => {
-    if (existingGroups[i]) {
-      return existingGroups[i];
+export const generateGroups = (themeCount: number, existingThemes: Group[] = []): Group[] => {
+  return Array.from({ length: themeCount }, (_, i) => {
+    if (existingThemes[i]) {
+      return existingThemes[i];
     }
     return {
       ...generateGroup(7),
-      label: `Group ${i + 1}`
+      label: `Theme ${i + 1}`
     };
   });
 };
