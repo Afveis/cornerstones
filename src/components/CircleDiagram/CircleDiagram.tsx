@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -216,36 +215,7 @@ export const CircleDiagram: React.FC = () => {
             </feMerge>
           </filter>
         </defs>
-        
-        {/* White center circle with shadow */}
-        <circle
-          cx={outerRadius}
-          cy={outerRadius}
-          r={centerRadius}
-          fill="white"
-          stroke="#E5E7EB"
-          filter="url(#centerShadow)"
-        />
-        
-        {/* Center image */}
-        <image
-          x={outerRadius - centerRadius + 20}
-          y={outerRadius - centerRadius + 20}
-          width={centerRadius * 2 - 40}
-          height={centerRadius * 2 - 40}
-          href={centerImage}
-          preserveAspectRatio="xMidYMid meet"
-        />
 
-        {/* Middle circle divided by groups */}
-        {groups.map((group, index) => (
-          <path
-            key={`middle-${index}`}
-            d={createMiddleCirclePath(index, groups.length)}
-            fill={group.color}
-          />
-        ))}
-        
         {/* Outer circle slices */}
         {groups.map((group, groupIndex) => (
           group.slices.map((slice, sliceIndex) => (
@@ -256,6 +226,34 @@ export const CircleDiagram: React.FC = () => {
             />
           ))
         ))}
+
+        {/* Middle circle divided by groups */}
+        {groups.map((group, index) => (
+          <path
+            key={`middle-${index}`}
+            d={createMiddleCirclePath(index, groups.length)}
+            fill={group.color}
+          />
+        ))}
+        
+        {/* White center circle with shadow and image (now on top) */}
+        <circle
+          cx={outerRadius}
+          cy={outerRadius}
+          r={centerRadius}
+          fill="white"
+          stroke="#E5E7EB"
+          filter="url(#centerShadow)"
+        />
+        
+        <image
+          x={outerRadius - centerRadius + 20}
+          y={outerRadius - centerRadius + 20}
+          width={centerRadius * 2 - 40}
+          height={centerRadius * 2 - 40}
+          href={centerImage}
+          preserveAspectRatio="xMidYMid meet"
+        />
       </svg>
     </div>
   );
