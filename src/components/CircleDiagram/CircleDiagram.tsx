@@ -44,7 +44,7 @@ export const CircleDiagram: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const centerRadius = 150;
-  const middleRadius = 170;
+  const middleRadius = 180; // Changed from 170 to 180
   const outerRadius = 300;
   const svgSize = outerRadius * 2 + 100;
   const gapAngle = (Math.PI / 180) * 1; // 1 degree gap
