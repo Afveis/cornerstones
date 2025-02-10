@@ -225,7 +225,7 @@ const Index: React.FC = () => {
               
               <div className="flex flex-col gap-4 p-4 border rounded-lg bg-white">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold">Local Configuration - Indicator {activeIndicator}</h2>
+                  <h2 className="text-lg font-semibold">Indicator {activeIndicator}</h2>
                   <input
                     type="file"
                     ref={fileInputRef}
