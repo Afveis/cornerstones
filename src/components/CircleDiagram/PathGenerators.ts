@@ -79,4 +79,19 @@ export class PathGenerators {
       A ${progressRadius} ${progressRadius} 0 ${largeArcFlag} 1 ${endX} ${endY}
     `;
   }
+
+  getSliceCenter(sliceIndex: number, groupIndex: number): { x: number; y: number } {
+    const availableAngle = 2 * Math.PI;
+    const sliceAngle = availableAngle / this.totalSlices;
+    const absoluteSliceIndex = this.slicesBeforeGroup[groupIndex] + sliceIndex;
+    const startAngle = absoluteSliceIndex * sliceAngle;
+    const middleAngle = startAngle + (sliceAngle / 2);
+    
+    const radius = (this.config.outerRadius + this.config.middleRadius) / 2;
+    
+    return {
+      x: this.config.outerRadius + Math.cos(middleAngle) * radius,
+      y: this.config.outerRadius + Math.sin(middleAngle) * radius
+    };
+  }
 }
