@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,10 +43,64 @@ export const CircleDiagram: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const centerRadius = 150;
-  const middleRadius = 180; // Changed from 170 to 180
+  const middleRadius = 180;
   const outerRadius = 300;
   const svgSize = outerRadius * 2 + 100;
-  const gapAngle = (Math.PI / 180) * 1; // 1 degree gap
+  const strokeWidth = 4;
+
+  const createMiddleCirclePath = (groupIndex: number, totalGroups: number) => {
+    const availableAngle = 2 * Math.PI;
+    
+    // Calculate the start and end angles based on the slices in previous groups
+    const slicesBeforeGroup = groups.slice(0, groupIndex).reduce((acc, group) => acc + group.slices.length, 0);
+    const groupSlices = groups[groupIndex].slices.length;
+    
+    const startAngle = (slicesBeforeGroup * (availableAngle / totalSlices));
+    const endAngle = startAngle + (groupSlices * (availableAngle / totalSlices));
+
+    const startX = outerRadius + Math.cos(startAngle) * middleRadius;
+    const startY = outerRadius + Math.sin(startAngle) * middleRadius;
+    const endX = outerRadius + Math.cos(endAngle) * middleRadius;
+    const endY = outerRadius + Math.sin(endAngle) * middleRadius;
+
+    const largeArcFlag = endAngle - startAngle <= Math.PI ? "0" : "1";
+
+    return `
+      M ${outerRadius} ${outerRadius}
+      L ${startX} ${startY}
+      A ${middleRadius} ${middleRadius} 0 ${largeArcFlag} 1 ${endX} ${endY}
+      Z
+    `;
+  };
+
+  const createSlicePath = (sliceIndex: number, groupIndex: number, totalSlices: number) => {
+    const availableAngle = 2 * Math.PI;
+    const sliceAngle = availableAngle / totalSlices;
+    const absoluteSliceIndex = groups.slice(0, groupIndex).reduce((acc, group) => acc + group.slices.length, 0) + sliceIndex;
+    const startAngle = absoluteSliceIndex * sliceAngle;
+    const endAngle = startAngle + sliceAngle;
+
+    const startOuterX = outerRadius + Math.cos(startAngle) * outerRadius;
+    const startOuterY = outerRadius + Math.sin(startAngle) * outerRadius;
+    const endOuterX = outerRadius + Math.cos(endAngle) * outerRadius;
+    const endOuterY = outerRadius + Math.sin(endAngle) * outerRadius;
+    const startInnerX = outerRadius + Math.cos(startAngle) * middleRadius;
+    const startInnerY = outerRadius + Math.sin(startAngle) * middleRadius;
+    const endInnerX = outerRadius + Math.cos(endAngle) * middleRadius;
+    const endInnerY = outerRadius + Math.sin(endAngle) * middleRadius;
+
+    const largeArcFlag = endAngle - startAngle <= Math.PI ? "0" : "1";
+
+    return `
+      M ${startOuterX} ${startOuterY}
+      A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 1 ${endOuterX} ${endOuterY}
+      L ${endInnerX} ${endInnerY}
+      A ${middleRadius} ${middleRadius} 0 ${largeArcFlag} 0 ${startInnerX} ${startInnerY}
+      Z
+    `;
+  };
+
+  const totalSlices = groups.reduce((acc, group) => acc + group.slices.length, 0);
 
   const updateGroupCount = (newGroupCount: number) => {
     setGroupCount(newGroupCount);
@@ -86,62 +139,6 @@ export const CircleDiagram: React.FC = () => {
       reader.readAsDataURL(file);
     }
   };
-
-  const createMiddleCirclePath = (groupIndex: number, totalGroups: number) => {
-    const totalGapAngle = gapAngle * totalSlices;
-    const availableAngle = 2 * Math.PI - totalGapAngle;
-    
-    // Calculate the start and end angles based on the slices in previous groups
-    const slicesBeforeGroup = groups.slice(0, groupIndex).reduce((acc, group) => acc + group.slices.length, 0);
-    const groupSlices = groups[groupIndex].slices.length;
-    
-    const startAngle = (slicesBeforeGroup * (availableAngle / totalSlices)) + (slicesBeforeGroup * gapAngle);
-    const endAngle = startAngle + (groupSlices * (availableAngle / totalSlices)) + ((groupSlices - 1) * gapAngle);
-
-    const startX = outerRadius + Math.cos(startAngle) * middleRadius;
-    const startY = outerRadius + Math.sin(startAngle) * middleRadius;
-    const endX = outerRadius + Math.cos(endAngle) * middleRadius;
-    const endY = outerRadius + Math.sin(endAngle) * middleRadius;
-
-    const largeArcFlag = endAngle - startAngle <= Math.PI ? "0" : "1";
-
-    return `
-      M ${outerRadius} ${outerRadius}
-      L ${startX} ${startY}
-      A ${middleRadius} ${middleRadius} 0 ${largeArcFlag} 1 ${endX} ${endY}
-      Z
-    `;
-  };
-
-  const createSlicePath = (sliceIndex: number, groupIndex: number, totalSlices: number) => {
-    const totalGapAngle = gapAngle * totalSlices;
-    const availableAngle = 2 * Math.PI - totalGapAngle;
-    const sliceAngle = availableAngle / totalSlices;
-    const absoluteSliceIndex = groups.slice(0, groupIndex).reduce((acc, group) => acc + group.slices.length, 0) + sliceIndex;
-    const startAngle = absoluteSliceIndex * (sliceAngle + gapAngle);
-    const endAngle = startAngle + sliceAngle;
-
-    const startOuterX = outerRadius + Math.cos(startAngle) * outerRadius;
-    const startOuterY = outerRadius + Math.sin(startAngle) * outerRadius;
-    const endOuterX = outerRadius + Math.cos(endAngle) * outerRadius;
-    const endOuterY = outerRadius + Math.sin(endAngle) * outerRadius;
-    const startInnerX = outerRadius + Math.cos(startAngle) * middleRadius;
-    const startInnerY = outerRadius + Math.sin(startAngle) * middleRadius;
-    const endInnerX = outerRadius + Math.cos(endAngle) * middleRadius;
-    const endInnerY = outerRadius + Math.sin(endAngle) * middleRadius;
-
-    const largeArcFlag = endAngle - startAngle <= Math.PI ? "0" : "1";
-
-    return `
-      M ${startOuterX} ${startOuterY}
-      A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 1 ${endOuterX} ${endOuterY}
-      L ${endInnerX} ${endInnerY}
-      A ${middleRadius} ${middleRadius} 0 ${largeArcFlag} 0 ${startInnerX} ${startInnerY}
-      Z
-    `;
-  };
-
-  const totalSlices = groups.reduce((acc, group) => acc + group.slices.length, 0);
 
   return (
     <div className="flex flex-col items-center gap-8 p-8">
@@ -231,6 +228,8 @@ export const CircleDiagram: React.FC = () => {
               key={`${groupIndex}-${sliceIndex}`}
               d={createSlicePath(sliceIndex, groupIndex, totalSlices)}
               fill={group.color}
+              stroke="white"
+              strokeWidth={strokeWidth}
             />
           ))
         ))}
@@ -241,6 +240,8 @@ export const CircleDiagram: React.FC = () => {
             key={`middle-${index}`}
             d={createMiddleCirclePath(index, groups.length)}
             fill={group.color}
+            stroke="white"
+            strokeWidth={strokeWidth}
           />
         ))}
         
