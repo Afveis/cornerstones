@@ -119,7 +119,7 @@ const Index: React.FC = () => {
                   onClick={() => fileInputRef.current?.click()}
                   variant="outline"
                 >
-                  Choose Center Image
+                  Replace illustration
                 </Button>
               </div>
               {themes.map((theme, themeIndex) => (
