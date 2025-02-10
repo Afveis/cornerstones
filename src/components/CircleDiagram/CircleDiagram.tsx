@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,11 +24,16 @@ const generateGroup = (sliceCount: number, color: string = '#E2E2E2'): Group => 
   sliceCount
 });
 
-const generateGroups = (groupCount: number): Group[] => {
-  return Array.from({ length: groupCount }, (_, i) => ({
-    ...generateGroup(7),
-    label: `Group ${i + 1}`
-  }));
+const generateGroups = (groupCount: number, existingGroups: Group[] = []): Group[] => {
+  return Array.from({ length: groupCount }, (_, i) => {
+    if (existingGroups[i]) {
+      return existingGroups[i];
+    }
+    return {
+      ...generateGroup(7),
+      label: `Group ${i + 1}`
+    };
+  });
 };
 
 export const CircleDiagram: React.FC = () => {
@@ -45,7 +49,7 @@ export const CircleDiagram: React.FC = () => {
 
   const updateGroupCount = (newGroupCount: number) => {
     setGroupCount(newGroupCount);
-    setGroups(generateGroups(newGroupCount));
+    setGroups(prevGroups => generateGroups(newGroupCount, prevGroups));
   };
 
   const updateGroupConfig = (groupIndex: number, color?: string, sliceCount?: number) => {
@@ -219,4 +223,3 @@ export const CircleDiagram: React.FC = () => {
     </div>
   );
 };
-
