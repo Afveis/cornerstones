@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from "react";
 import { CircleDiagram } from "@/components/CircleDiagram/CircleDiagram";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -7,10 +6,8 @@ import { generateGroups } from "@/components/CircleDiagram/utils";
 import { ThemeConfiguration } from "@/components/CircleDiagram/ThemeConfiguration";
 import { IndicatorCard } from "@/components/CircleDiagram/IndicatorCard";
 import { IndicatorControls } from "@/components/CircleDiagram/IndicatorControls";
-import { useToast } from "@/components/ui/use-toast";
 
 const Index: React.FC = () => {
-  const { toast } = useToast();
   const [activeIndicator, setActiveIndicator] = useState<number>(1);
   const [globalConfig, setGlobalConfig] = useState<GlobalConfig>(() => {
     const savedConfig = localStorage.getItem('globalConfig');
@@ -40,11 +37,7 @@ const Index: React.FC = () => {
 
   useEffect(() => {
     localStorage.setItem('globalConfig', JSON.stringify(globalConfig));
-    toast({
-      title: "Settings saved",
-      description: "Your theme configuration has been saved.",
-    });
-  }, [globalConfig, toast]);
+  }, [globalConfig]);
 
   const updateGlobalConfig = (newThemeCount?: number, newSliceCount?: number) => {
     setGlobalConfig(prev => {
@@ -259,4 +252,3 @@ const Index: React.FC = () => {
 };
 
 export default Index;
-
