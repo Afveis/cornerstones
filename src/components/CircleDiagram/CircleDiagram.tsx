@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Group } from './types';
@@ -63,11 +64,13 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
       if (file) {
         const reader = new FileReader();
         reader.onload = (e) => {
-          if (e.target?.result) {
-            const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+          const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+          if (fileInput && file) {
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileInput.files = dataTransfer.files;
             const changeEvent = new Event('change', { bubbles: true });
-            Object.defineProperty(changeEvent, 'target', { value: { files: [file] } });
-            fileInput?.dispatchEvent(changeEvent);
+            fileInput.dispatchEvent(changeEvent);
           }
         };
         reader.readAsDataURL(file);
@@ -164,3 +167,4 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
     </div>
   );
 };
+
