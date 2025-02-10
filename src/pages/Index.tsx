@@ -1,5 +1,4 @@
-
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { CircleDiagram } from "@/components/CircleDiagram/CircleDiagram";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Group, Indicator, GlobalConfig } from "@/components/CircleDiagram/types";
@@ -7,13 +6,21 @@ import { generateGroups } from "@/components/CircleDiagram/utils";
 import { ThemeConfiguration } from "@/components/CircleDiagram/ThemeConfiguration";
 import { IndicatorCard } from "@/components/CircleDiagram/IndicatorCard";
 import { IndicatorControls } from "@/components/CircleDiagram/IndicatorControls";
+import { useToast } from "@/components/ui/use-toast";
 
 const Index: React.FC = () => {
+  const { toast } = useToast();
   const [activeIndicator, setActiveIndicator] = useState<number>(1);
-  const [globalConfig, setGlobalConfig] = useState<GlobalConfig>({
-    themeCount: 3,
-    sliceCount: 7,
-    groups: generateGroups(3),
+  const [globalConfig, setGlobalConfig] = useState<GlobalConfig>(() => {
+    const savedConfig = localStorage.getItem('themeSettings');
+    if (savedConfig) {
+      return JSON.parse(savedConfig);
+    }
+    return {
+      themeCount: 3,
+      sliceCount: 7,
+      groups: generateGroups(3),
+    };
   });
   
   const [indicators, setIndicators] = useState<Indicator[]>([
@@ -26,24 +33,42 @@ const Index: React.FC = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    localStorage.setItem('themeSettings', JSON.stringify(globalConfig));
+  }, [globalConfig]);
+
   const updateGlobalConfig = (newThemeCount?: number, newSliceCount?: number) => {
     setGlobalConfig(prev => {
       const themeCount = newThemeCount ?? prev.themeCount;
       const sliceCount = newSliceCount ?? prev.sliceCount;
-      const groups = generateGroups(themeCount);
-      groups.forEach(group => {
-        group.sliceCount = sliceCount;
-        group.slices = Array.from({ length: sliceCount }, (_, i) => ({
-          color: group.color,
-          rankingColor: group.rankingColor,
-          label: `Slice ${i + 1}`,
-          progress: 0
-        }));
+      
+      // Generate new groups while preserving existing settings where possible
+      const newGroups = Array.from({ length: themeCount }, (_, index) => {
+        if (index < prev.groups.length) {
+          // Keep existing group settings
+          return {
+            ...prev.groups[index],
+            sliceCount: sliceCount,
+            slices: Array.from({ length: sliceCount }, (_, i) => ({
+              color: prev.groups[index].color,
+              rankingColor: prev.groups[index].rankingColor,
+              label: `Slice ${i + 1}`,
+              progress: 0
+            }))
+          };
+        } else {
+          // Generate new group for additional themes
+          return {
+            ...generateGroups(1)[0],
+            label: `Theme ${index + 1}`,
+            sliceCount: sliceCount
+          };
+        }
       });
       
       setIndicators(prevIndicators => 
         prevIndicators.map(indicator => {
-          const newGroups = groups.map((group, groupIndex) => ({
+          const newIndicatorGroups = newGroups.map((group, groupIndex) => ({
             ...group,
             slices: group.slices.map((slice, sliceIndex) => ({
               ...slice,
@@ -52,15 +77,20 @@ const Index: React.FC = () => {
           }));
           return {
             ...indicator,
-            groups: newGroups
+            groups: newIndicatorGroups
           };
         })
       );
 
+      toast({
+        title: "Settings saved",
+        description: "Theme configuration has been saved successfully.",
+      });
+
       return {
         themeCount,
         sliceCount,
-        groups
+        groups: newGroups
       };
     });
   };
