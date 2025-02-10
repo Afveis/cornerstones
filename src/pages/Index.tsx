@@ -98,7 +98,7 @@ const Index: React.FC = () => {
             <div className="flex flex-col gap-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium">Number of Groups:</span>
+                  <span className="text-sm font-medium">Number of Themes:</span>
                   <Input
                     type="number"
                     min="1"
