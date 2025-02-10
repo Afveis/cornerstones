@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { GroupControls } from "@/components/CircleDiagram/GroupControls";
 import { Group } from "@/components/CircleDiagram/types";
 import { generateGroups } from "@/components/CircleDiagram/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Index: React.FC = () => {
   const [groupCount, setGroupCount] = React.useState<number>(3);
@@ -67,7 +68,7 @@ const Index: React.FC = () => {
 
   return (
     <main className="flex min-h-screen">
-      <div className="flex-1 bg-white p-8 flex items-center justify-center">
+      <div className="flex-1 bg-white p-8 flex items-center justify-center fixed left-0 right-[600px]">
         <CircleDiagram 
           groups={groups}
           groupCount={groupCount}
@@ -76,37 +77,41 @@ const Index: React.FC = () => {
           onUpdateProgress={updateSliceProgress}
         />
       </div>
-      <div className="w-[600px] bg-[#F3F3F3] p-8 overflow-y-auto">
-        <div className="flex flex-col gap-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">Number of Groups:</span>
-              <Input
-                type="number"
-                min="1"
-                max="10"
-                value={groupCount}
-                onChange={(e) => updateGroupCount(Number(e.target.value))}
-                className="w-20"
-              />
+      <div className="w-[600px] fixed right-0 top-0 bottom-0 bg-[#F3F3F3]">
+        <ScrollArea className="h-full">
+          <div className="p-8">
+            <div className="flex flex-col gap-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">Number of Groups:</span>
+                  <Input
+                    type="number"
+                    min="1"
+                    max="10"
+                    value={groupCount}
+                    onChange={(e) => updateGroupCount(Number(e.target.value))}
+                    className="w-20"
+                  />
+                </div>
+                <Button 
+                  onClick={() => fileInputRef.current?.click()}
+                  variant="outline"
+                >
+                  Choose Center Image
+                </Button>
+              </div>
+              {groups.map((group, groupIndex) => (
+                <GroupControls
+                  key={groupIndex}
+                  group={group}
+                  groupIndex={groupIndex}
+                  onUpdateConfig={updateGroupConfig}
+                  onUpdateProgress={updateSliceProgress}
+                />
+              ))}
             </div>
-            <Button 
-              onClick={() => fileInputRef.current?.click()}
-              variant="outline"
-            >
-              Choose Center Image
-            </Button>
           </div>
-          {groups.map((group, groupIndex) => (
-            <GroupControls
-              key={groupIndex}
-              group={group}
-              groupIndex={groupIndex}
-              onUpdateConfig={updateGroupConfig}
-              onUpdateProgress={updateSliceProgress}
-            />
-          ))}
-        </div>
+        </ScrollArea>
       </div>
     </main>
   );
