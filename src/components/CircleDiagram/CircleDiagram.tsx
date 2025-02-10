@@ -1,11 +1,10 @@
-
 import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 interface Slice {
   color: string;
-  rankingColor: string;
+  rankingColor: string; // New property for ranking circles color
   label: string;
   progress: number;
 }
@@ -14,7 +13,7 @@ interface Group {
   slices: Slice[];
   label: string;
   color: string;
-  rankingColor: string;
+  rankingColor: string; // New property for ranking circles color
   sliceCount: number;
 }
 
@@ -51,7 +50,7 @@ export const CircleDiagram: React.FC = () => {
 
   const centerRadius = 150;
   const middleRadius = 180;
-  const outerRadius = 180;
+  const outerRadius = 300;
   const progressStep = 24;
   const svgSize = outerRadius * 2 + 100;
   const strokeWidth = 4;
