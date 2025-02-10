@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Group } from './types';
 import { PathGenerators } from './PathGenerators';
@@ -19,9 +18,23 @@ interface CircleDiagramProps {
 export const CircleDiagram: React.FC<CircleDiagramProps> = ({
   groups,
   groupCount,
+  onUpdateProgress,
   centerImage,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    const handleProgressChange = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const { groupIndex, sliceIndex, progress } = customEvent.detail;
+      onUpdateProgress(groupIndex, sliceIndex, progress);
+    };
+
+    document.addEventListener('progress-change', handleProgressChange);
+    return () => {
+      document.removeEventListener('progress-change', handleProgressChange);
+    };
+  }, [onUpdateProgress]);
 
   const config = {
     centerRadius: 150,
