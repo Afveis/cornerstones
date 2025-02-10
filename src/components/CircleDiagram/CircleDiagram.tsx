@@ -102,16 +102,16 @@ export const CircleDiagram: React.FC = () => {
       </div>
       
       <svg width={svgSize} height={svgSize} viewBox={`0 0 ${svgSize} ${svgSize}`}>
-        {/* Define shadow filter */}
         <defs>
-          <filter id="centerShadow" x="-50%" y="-50%" width="200%" height="200%">
-            <feDropShadow 
-              dx="0" 
-              dy="0" 
-              stdDeviation="30" 
-              floodColor="#535353"
-              floodOpacity="0.5"
-            />
+          <filter id="centerShadow">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="8" />
+            <feOffset dx="0" dy="0" result="offsetblur" />
+            <feFlood floodColor="#535353" floodOpacity="0.5" />
+            <feComposite in2="offsetblur" operator="in" />
+            <feMerge>
+              <feMergeNode />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
           </filter>
         </defs>
         
