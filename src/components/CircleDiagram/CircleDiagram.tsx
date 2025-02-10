@@ -9,13 +9,8 @@ interface Slice {
 }
 
 const generateSlices = (count: number): Slice[] => {
-  const colors = [
-    '#F1F0FB', '#E5DEFF', '#FFDEE2', '#FEC6A1', '#FEF7CD',
-    '#F2FCE2', '#D3E4FD', '#FDE1D3', '#8E9196'
-  ];
-  
   return Array.from({ length: count }, (_, i) => ({
-    color: colors[i % colors.length],
+    color: '#E2E2E2',
     label: `Slice ${i + 1}`
   }));
 };
@@ -141,8 +136,6 @@ export const CircleDiagram: React.FC = () => {
             key={index}
             d={createSlicePath(index, slices.length)}
             fill={slice.color}
-            stroke="#E5E7EB"
-            strokeWidth="1"
           />
         ))}
       </svg>
