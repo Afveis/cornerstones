@@ -24,6 +24,7 @@ export const CircleDiagram: React.FC = () => {
   const centerRadius = 150;
   const outerRadius = 300;
   const svgSize = outerRadius * 2 + 100;
+  const gapAngle = (Math.PI / 180) * 1; // 1 degree gap
 
   const updateSlices = (count: number) => {
     setSliceCount(count);
@@ -42,9 +43,11 @@ export const CircleDiagram: React.FC = () => {
   };
 
   const createSlicePath = (index: number, total: number) => {
-    const anglePerSlice = (2 * Math.PI) / total;
-    const startAngle = index * anglePerSlice;
-    const endAngle = (index + 1) * anglePerSlice;
+    const totalGapAngle = gapAngle * total;
+    const availableAngle = 2 * Math.PI - totalGapAngle;
+    const sliceAngle = availableAngle / total;
+    const startAngle = index * (sliceAngle + gapAngle);
+    const endAngle = startAngle + sliceAngle;
 
     const startOuterX = outerRadius + Math.cos(startAngle) * outerRadius;
     const startOuterY = outerRadius + Math.sin(startAngle) * outerRadius;
