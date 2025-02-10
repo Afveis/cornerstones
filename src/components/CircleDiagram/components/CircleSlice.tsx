@@ -29,15 +29,15 @@ export const CircleSlice: React.FC<CircleSliceProps> = ({
   config,
 }) => {
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <g className="cursor-pointer">
+    <Tooltip delayDuration={0}>
+      <TooltipTrigger>
+        <g>
           <path
             d={pathGenerators.createSlicePath(sliceIndex, groupIndex)}
             fill={group.color}
             stroke="white"
             strokeWidth={config.strokeWidth}
-            className="hover:opacity-90 transition-opacity"
+            className="cursor-pointer hover:opacity-90 transition-opacity"
           />
           {Array.from({ length: slice.progress }, (_, i) => (
             <path
@@ -55,3 +55,4 @@ export const CircleSlice: React.FC<CircleSliceProps> = ({
     </Tooltip>
   );
 };
+
