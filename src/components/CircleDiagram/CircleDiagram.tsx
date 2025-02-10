@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -23,6 +23,8 @@ const generateSlices = (count: number): Slice[] => {
 export const CircleDiagram: React.FC = () => {
   const [sliceCount, setSliceCount] = useState<number>(22);
   const [slices, setSlices] = useState<Slice[]>(generateSlices(22));
+  const [centerImage, setCenterImage] = useState<string>("/lovable-uploads/ad390dfb-65ef-43f9-a728-84385f728052.png");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const centerRadius = 150;
   const outerRadius = 300;
@@ -31,6 +33,17 @@ export const CircleDiagram: React.FC = () => {
   const updateSlices = (count: number) => {
     setSliceCount(count);
     setSlices(generateSlices(count));
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setCenterImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const createSlicePath = (index: number, total: number) => {
@@ -72,6 +85,22 @@ export const CircleDiagram: React.FC = () => {
         <Button onClick={() => updateSlices(sliceCount)}>Update Slices</Button>
       </div>
       
+      <div className="flex items-center gap-4">
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleImageUpload}
+          accept="image/*"
+          className="hidden"
+        />
+        <Button 
+          onClick={() => fileInputRef.current?.click()}
+          variant="outline"
+        >
+          Choose Center Image
+        </Button>
+      </div>
+      
       <svg width={svgSize} height={svgSize} viewBox={`0 0 ${svgSize} ${svgSize}`}>
         {/* White center circle */}
         <circle
@@ -88,7 +117,7 @@ export const CircleDiagram: React.FC = () => {
           y={outerRadius - centerRadius + 20}
           width={centerRadius * 2 - 40}
           height={centerRadius * 2 - 40}
-          href="/lovable-uploads/ad390dfb-65ef-43f9-a728-84385f728052.png"
+          href={centerImage}
           preserveAspectRatio="xMidYMid meet"
         />
         
