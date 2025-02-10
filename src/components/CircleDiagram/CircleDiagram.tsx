@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -214,6 +215,13 @@ export const CircleDiagram: React.FC = () => {
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
+          <clipPath id="centerCircleClip">
+            <circle
+              cx={outerRadius}
+              cy={outerRadius}
+              r={centerRadius}
+            />
+          </clipPath>
         </defs>
 
         {/* Outer circle slices */}
@@ -236,7 +244,7 @@ export const CircleDiagram: React.FC = () => {
           />
         ))}
         
-        {/* White center circle with shadow and image (now on top) */}
+        {/* White center circle with shadow */}
         <circle
           cx={outerRadius}
           cy={outerRadius}
@@ -253,6 +261,7 @@ export const CircleDiagram: React.FC = () => {
           height={centerRadius * 2 - 40}
           href={centerImage}
           preserveAspectRatio="xMidYMid meet"
+          clipPath="url(#centerCircleClip)"
         />
       </svg>
     </div>
