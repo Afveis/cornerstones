@@ -97,6 +97,25 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
     return `M ${startX} ${startY} A ${radius} ${radius} 0 0 1 ${endX} ${endY}`;
   };
 
+  const createSliceTextPath = (sliceIndex: number, groupIndex: number) => {
+    const availableAngle = 2 * Math.PI;
+    const sliceAngle = availableAngle / totalSlices;
+    const absoluteSliceIndex = slicesBeforeGroup[groupIndex] + sliceIndex;
+    const startAngle = absoluteSliceIndex * sliceAngle;
+    const endAngle = startAngle + sliceAngle;
+    const middleAngle = (startAngle + endAngle) / 2;
+    const radius = 280;
+    
+    const arcSpan = 0.2;
+    
+    const startX = config.outerRadius + Math.cos(middleAngle - arcSpan) * radius;
+    const startY = config.outerRadius + Math.sin(middleAngle - arcSpan) * radius;
+    const endX = config.outerRadius + Math.cos(middleAngle + arcSpan) * radius;
+    const endY = config.outerRadius + Math.sin(middleAngle + arcSpan) * radius;
+
+    return `M ${startX} ${startY} A ${radius} ${radius} 0 0 1 ${endX} ${endY}`;
+  };
+
   return (
     <div className="flex flex-col items-center">
       <TooltipProvider>
@@ -115,6 +134,16 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
                 d={createTextPath(index, group)}
                 fill="none"
               />
+            ))}
+            {groups.map((group, groupIndex) => (
+              group.slices.map((_, sliceIndex) => (
+                <path
+                  key={`slice-text-path-${groupIndex}-${sliceIndex}`}
+                  id={`slice-curve-${groupIndex}-${sliceIndex}`}
+                  d={createSliceTextPath(sliceIndex, groupIndex)}
+                  fill="none"
+                />
+              ))
             ))}
           </defs>
 
@@ -203,6 +232,25 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
                 {group.label || `Theme ${index + 1}`}
               </textPath>
             </text>
+          ))}
+
+          {groups.map((group, groupIndex) => (
+            group.slices.map((slice, sliceIndex) => (
+              <text
+                key={`slice-label-${groupIndex}-${sliceIndex}`}
+                className="text-[0.5rem] font-medium uppercase"
+                fill="white"
+                style={{ zIndex: 50 }}
+              >
+                <textPath
+                  href={`#slice-curve-${groupIndex}-${sliceIndex}`}
+                  startOffset="50%"
+                  textAnchor="middle"
+                >
+                  {slice.label || `Slice ${sliceIndex + 1}`}
+                </textPath>
+              </text>
+            ))
           ))}
         </svg>
       </TooltipProvider>
