@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from "react";
 import { CircleDiagram } from "@/components/CircleDiagram/CircleDiagram";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -6,8 +7,10 @@ import { generateGroups } from "@/components/CircleDiagram/utils";
 import { ThemeConfiguration } from "@/components/CircleDiagram/ThemeConfiguration";
 import { IndicatorCard } from "@/components/CircleDiagram/IndicatorCard";
 import { IndicatorControls } from "@/components/CircleDiagram/IndicatorControls";
+import { useToast } from "@/components/ui/use-toast";
 
 const Index: React.FC = () => {
+  const { toast } = useToast();
   const [activeIndicator, setActiveIndicator] = useState<number>(1);
   const [globalConfig, setGlobalConfig] = useState<GlobalConfig>(() => {
     const savedConfig = localStorage.getItem('globalConfig');
@@ -37,54 +40,41 @@ const Index: React.FC = () => {
 
   useEffect(() => {
     localStorage.setItem('globalConfig', JSON.stringify(globalConfig));
-  }, [globalConfig]);
+    toast({
+      title: "Settings saved",
+      description: "Your theme configuration has been saved.",
+    });
+  }, [globalConfig, toast]);
 
   const updateGlobalConfig = (newThemeCount?: number, newSliceCount?: number) => {
     setGlobalConfig(prev => {
       const themeCount = newThemeCount ?? prev.themeCount;
       const sliceCount = newSliceCount ?? prev.sliceCount;
-      let groups: Group[];
-
-      if (newThemeCount !== undefined) {
-        // If theme count is changing, preserve existing theme settings
-        if (newThemeCount > prev.groups.length) {
-          // Adding new themes
-          const existingGroups = [...prev.groups];
-          const newGroups = generateGroups(newThemeCount - prev.groups.length);
-          groups = [...existingGroups, ...newGroups];
-        } else {
-          // Reducing number of themes
-          groups = prev.groups.slice(0, newThemeCount);
-        }
-      } else {
-        groups = prev.groups;
-      }
-
-      // Update slice count if needed
-      if (newSliceCount !== undefined) {
-        groups = groups.map(group => ({
-          ...group,
-          sliceCount: newSliceCount,
-          slices: Array.from({ length: newSliceCount }, (_, i) => ({
-            color: group.color,
-            rankingColor: group.rankingColor,
-            label: `Slice ${i + 1}`,
-            progress: 0
-          }))
+      const groups = generateGroups(themeCount);
+      groups.forEach(group => {
+        group.sliceCount = sliceCount;
+        group.slices = Array.from({ length: sliceCount }, (_, i) => ({
+          color: group.color,
+          rankingColor: group.rankingColor,
+          label: `Slice ${i + 1}`,
+          progress: 0
         }));
-      }
+      });
       
       setIndicators(prevIndicators => 
-        prevIndicators.map(indicator => ({
-          ...indicator,
-          groups: groups.map((group, groupIndex) => ({
+        prevIndicators.map(indicator => {
+          const newGroups = groups.map((group, groupIndex) => ({
             ...group,
             slices: group.slices.map((slice, sliceIndex) => ({
               ...slice,
               progress: indicator.groups[groupIndex]?.slices[sliceIndex]?.progress || 0
             }))
-          }))
-        }))
+          }));
+          return {
+            ...indicator,
+            groups: newGroups
+          };
+        })
       );
 
       return {
