@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Group } from './types';
@@ -85,7 +86,7 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
     const endAngle = startAngle + (group.slices.length * (availableAngle / totalSlices));
     const middleAngle = (startAngle + endAngle) / 2;
     
-    const radius = 172; // Text circle radius
+    const radius = 172;
     const x = config.outerRadius + Math.cos(middleAngle) * radius;
     const y = config.outerRadius + Math.sin(middleAngle) * radius;
     
@@ -111,23 +112,6 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
             groups={groups}
             pathGenerators={pathGenerators}
           />
-
-          {groups.map((group, index) => {
-            const position = getThemeLabelPosition(index, group);
-            return (
-              <text
-                key={`theme-label-${index}`}
-                x={position.x}
-                y={position.y}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                transform={`rotate(${position.rotation}, ${position.x}, ${position.y})`}
-                className="text-sm font-medium fill-gray-600"
-              >
-                {group.label || `Theme ${index + 1}`}
-              </text>
-            );
-          })}
 
           {groups.map((group, groupIndex) => (
             group.slices.map((slice, sliceIndex) => (
@@ -198,6 +182,26 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
               </foreignObject>
             )}
           </g>
+
+          {/* Theme labels rendered last to appear on top */}
+          {groups.map((group, index) => {
+            const position = getThemeLabelPosition(index, group);
+            return (
+              <text
+                key={`theme-label-${index}`}
+                x={position.x}
+                y={position.y}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                transform={`rotate(${position.rotation}, ${position.x}, ${position.y})`}
+                className="text-sm font-medium"
+                fill="#000000"
+                style={{ zIndex: 50 }}
+              >
+                {group.label || `Theme ${index + 1}`}
+              </text>
+            );
+          })}
         </svg>
       </TooltipProvider>
     </div>
