@@ -86,10 +86,13 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
     const middleAngle = (startAngle + endAngle) / 2;
     const radius = 166;
     
-    const startX = config.outerRadius + Math.cos(middleAngle - 0.2) * radius;
-    const startY = config.outerRadius + Math.sin(middleAngle - 0.2) * radius;
-    const endX = config.outerRadius + Math.cos(middleAngle + 0.2) * radius;
-    const endY = config.outerRadius + Math.sin(middleAngle + 0.2) * radius;
+    const textLength = (group.label || `Theme ${groupIndex + 1}`).length;
+    const arcSpan = Math.max(0.2, Math.min(0.8, textLength * 0.04));
+    
+    const startX = config.outerRadius + Math.cos(middleAngle - arcSpan) * radius;
+    const startY = config.outerRadius + Math.sin(middleAngle - arcSpan) * radius;
+    const endX = config.outerRadius + Math.cos(middleAngle + arcSpan) * radius;
+    const endY = config.outerRadius + Math.sin(middleAngle + arcSpan) * radius;
 
     return `M ${startX} ${startY} A ${radius} ${radius} 0 0 1 ${endX} ${endY}`;
   };
