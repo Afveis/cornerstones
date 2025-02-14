@@ -90,9 +90,9 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
     const x = config.outerRadius + Math.cos(middleAngle) * radius;
     const y = config.outerRadius + Math.sin(middleAngle) * radius;
     
-    let rotationAngle = (middleAngle * 180) / Math.PI;
+    let rotationAngle = (middleAngle * 180) / Math.PI + 90; // Added 90 degrees
     
-    if (rotationAngle > 90 && rotationAngle < 270) {
+    if (rotationAngle > 180 && rotationAngle < 360) {
       rotationAngle += 180;
     }
 
