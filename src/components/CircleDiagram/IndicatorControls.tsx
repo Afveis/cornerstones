@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Indicator } from "./types";
@@ -10,6 +10,7 @@ interface IndicatorControlsProps {
   onUpdateProgress: (themeIndex: number, sliceIndex: number, progress: number) => void;
   onImageUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
   fileInputRef: React.RefObject<HTMLInputElement>;
+  onUpdateIndicatorName?: (id: number, name: string) => void;
 }
 
 export const IndicatorControls: React.FC<IndicatorControlsProps> = ({
@@ -18,11 +19,52 @@ export const IndicatorControls: React.FC<IndicatorControlsProps> = ({
   onUpdateProgress,
   onImageUpload,
   fileInputRef,
+  onUpdateIndicatorName,
 }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingName, setEditingName] = useState(`Indicator ${activeIndicator}`);
+
+  const handleDoubleClick = () => {
+    setIsEditing(true);
+    setEditingName(`Indicator ${activeIndicator}`);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      onUpdateIndicatorName?.(activeIndicator, editingName);
+      setIsEditing(false);
+    } else if (e.key === 'Escape') {
+      setIsEditing(false);
+    }
+  };
+
+  const handleBlur = () => {
+    if (isEditing) {
+      onUpdateIndicatorName?.(activeIndicator, editingName);
+      setIsEditing(false);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4 p-4 border rounded-lg bg-white">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Indicator {activeIndicator}</h2>
+        {isEditing ? (
+          <Input
+            value={editingName}
+            onChange={(e) => setEditingName(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={handleBlur}
+            autoFocus
+            className="w-[200px]"
+          />
+        ) : (
+          <h2 
+            className="text-lg font-semibold cursor-pointer"
+            onDoubleClick={handleDoubleClick}
+          >
+            Indicator {activeIndicator}
+          </h2>
+        )}
         <input
           type="file"
           ref={fileInputRef}

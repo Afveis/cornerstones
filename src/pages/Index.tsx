@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from "react";
 import { CircleDiagram } from "@/components/CircleDiagram/CircleDiagram";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -96,7 +95,7 @@ const Index: React.FC = () => {
     });
   };
 
-  const updateThemeConfig = (themeIndex: number, color?: string, rankingColor?: string, sliceCount?: number) => {
+  const updateThemeConfig = (themeIndex: number, color?: string, rankingColor?: string, sliceCount?: number, label?: string) => {
     setGlobalConfig(prev => {
       const newGroups = [...prev.groups];
       const currentTheme = { ...newGroups[themeIndex] };
@@ -126,6 +125,10 @@ const Index: React.FC = () => {
           progress: 0
         }));
         currentTheme.slices = newSlices;
+      }
+
+      if (label !== undefined) {
+        currentTheme.label = label;
       }
       
       newGroups[themeIndex] = currentTheme;
@@ -201,6 +204,16 @@ const Index: React.FC = () => {
     }
   };
 
+  const updateIndicatorName = (id: number, name: string) => {
+    setIndicators(prevIndicators =>
+      prevIndicators.map(indicator =>
+        indicator.id === id
+          ? { ...indicator, name }
+          : indicator
+      )
+    );
+  };
+
   const activeIndicatorData = indicators.find(i => i.id === activeIndicator) || indicators[0];
 
   return (
@@ -244,6 +257,7 @@ const Index: React.FC = () => {
                 onUpdateProgress={updateSliceProgress}
                 onImageUpload={handleImageUpload}
                 fileInputRef={fileInputRef}
+                onUpdateIndicatorName={updateIndicatorName}
               />
             </div>
           </div>

@@ -1,12 +1,12 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Group, GlobalConfig } from "./types";
 
 interface ThemeConfigurationProps {
   globalConfig: GlobalConfig;
   onUpdateGlobalConfig: (newThemeCount?: number, newSliceCount?: number) => void;
-  onUpdateThemeConfig: (themeIndex: number, color?: string, rankingColor?: string, sliceCount?: number) => void;
+  onUpdateThemeConfig: (themeIndex: number, color?: string, rankingColor?: string, sliceCount?: number, label?: string) => void;
 }
 
 export const ThemeConfiguration: React.FC<ThemeConfigurationProps> = ({
@@ -14,6 +14,30 @@ export const ThemeConfiguration: React.FC<ThemeConfigurationProps> = ({
   onUpdateGlobalConfig,
   onUpdateThemeConfig,
 }) => {
+  const [editingTheme, setEditingTheme] = useState<number | null>(null);
+  const [editingLabel, setEditingLabel] = useState("");
+
+  const handleDoubleClick = (index: number, currentLabel: string) => {
+    setEditingTheme(index);
+    setEditingLabel(currentLabel);
+  };
+
+  const handleLabelKeyDown = (e: React.KeyboardEvent, index: number) => {
+    if (e.key === 'Enter') {
+      onUpdateThemeConfig(index, undefined, undefined, undefined, editingLabel);
+      setEditingTheme(null);
+    } else if (e.key === 'Escape') {
+      setEditingTheme(null);
+    }
+  };
+
+  const handleLabelBlur = (index: number) => {
+    if (editingTheme !== null) {
+      onUpdateThemeConfig(index, undefined, undefined, undefined, editingLabel);
+      setEditingTheme(null);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4 p-4 border rounded-lg bg-white">
       <h2 className="text-lg font-semibold">Theme Configuration</h2>
@@ -33,7 +57,23 @@ export const ThemeConfiguration: React.FC<ThemeConfigurationProps> = ({
       {globalConfig.groups.map((theme, themeIndex) => (
         <div key={themeIndex} className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
-            <span className="text-sm font-medium min-w-[100px]">{theme.label}</span>
+            {editingTheme === themeIndex ? (
+              <Input
+                value={editingLabel}
+                onChange={(e) => setEditingLabel(e.target.value)}
+                onKeyDown={(e) => handleLabelKeyDown(e, themeIndex)}
+                onBlur={() => handleLabelBlur(themeIndex)}
+                autoFocus
+                className="w-[100px]"
+              />
+            ) : (
+              <span 
+                className="text-sm font-medium min-w-[100px] cursor-pointer"
+                onDoubleClick={() => handleDoubleClick(themeIndex, theme.label || `Theme ${themeIndex + 1}`)}
+              >
+                {theme.label || `Theme ${themeIndex + 1}`}
+              </span>
+            )}
             <div className="flex items-center gap-2">
               <span className="text-sm">Slice Color:</span>
               <input
