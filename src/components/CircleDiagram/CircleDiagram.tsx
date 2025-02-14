@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Group } from './types';
@@ -80,27 +79,19 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
     input.click();
   };
 
-  const getThemeLabelPosition = (groupIndex: number, group: Group) => {
+  const createTextPath = (groupIndex: number, group: Group) => {
     const availableAngle = 2 * Math.PI;
     const startAngle = (slicesBeforeGroup[groupIndex] * (availableAngle / totalSlices));
     const endAngle = startAngle + (group.slices.length * (availableAngle / totalSlices));
     const middleAngle = (startAngle + endAngle) / 2;
-    
     const radius = 166;
-    const x = config.outerRadius + Math.cos(middleAngle) * radius;
-    const y = config.outerRadius + Math.sin(middleAngle) * radius;
     
-    let rotationAngle = (middleAngle * 180) / Math.PI + 90;
-    
-    if (rotationAngle > 180 && rotationAngle < 360) {
-      rotationAngle += 180;
-    }
+    const startX = config.outerRadius + Math.cos(middleAngle - 0.2) * radius;
+    const startY = config.outerRadius + Math.sin(middleAngle - 0.2) * radius;
+    const endX = config.outerRadius + Math.cos(middleAngle + 0.2) * radius;
+    const endY = config.outerRadius + Math.sin(middleAngle + 0.2) * radius;
 
-    return {
-      x,
-      y,
-      rotation: rotationAngle
-    };
+    return `M ${startX} ${startY} A ${radius} ${radius} 0 0 1 ${endX} ${endY}`;
   };
 
   return (
@@ -112,6 +103,17 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
             groups={groups}
             pathGenerators={pathGenerators}
           />
+
+          <defs>
+            {groups.map((group, index) => (
+              <path
+                key={`text-path-${index}`}
+                id={`curve${index}`}
+                d={createTextPath(index, group)}
+                fill="none"
+              />
+            ))}
+          </defs>
 
           {groups.map((group, groupIndex) => (
             group.slices.map((slice, sliceIndex) => (
@@ -183,25 +185,22 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
             )}
           </g>
 
-          {/* Theme labels rendered last to appear on top */}
-          {groups.map((group, index) => {
-            const position = getThemeLabelPosition(index, group);
-            return (
-              <text
-                key={`theme-label-${index}`}
-                x={position.x}
-                y={position.y}
+          {groups.map((group, index) => (
+            <text
+              key={`theme-label-${index}`}
+              className="text-sm font-medium"
+              fill="#000000"
+              style={{ zIndex: 50 }}
+            >
+              <textPath
+                href={`#curve${index}`}
+                startOffset="50%"
                 textAnchor="middle"
-                dominantBaseline="middle"
-                transform={`rotate(${position.rotation}, ${position.x}, ${position.y})`}
-                className="text-sm font-medium"
-                fill="#000000"
-                style={{ zIndex: 50 }}
               >
                 {group.label || `Theme ${index + 1}`}
-              </text>
-            );
-          })}
+              </textPath>
+            </text>
+          ))}
         </svg>
       </TooltipProvider>
     </div>
