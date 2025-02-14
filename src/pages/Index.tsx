@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from "react";
 import { CircleDiagram } from "@/components/CircleDiagram/CircleDiagram";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -228,6 +229,7 @@ const Index: React.FC = () => {
         <ScrollArea className="h-full">
           <div className="p-8">
             <div className="flex flex-col gap-6">
+              <h1 className="text-2xl font-bold text-gray-900">Indicator {activeIndicator}</h1>
               <ThemeConfiguration
                 globalConfig={globalConfig}
                 onUpdateGlobalConfig={updateGlobalConfig}
