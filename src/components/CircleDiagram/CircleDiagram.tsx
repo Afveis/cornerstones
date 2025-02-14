@@ -84,7 +84,7 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
     const startAngle = (slicesBeforeGroup[groupIndex] * (availableAngle / totalSlices));
     const endAngle = startAngle + (group.slices.length * (availableAngle / totalSlices));
     const middleAngle = (startAngle + endAngle) / 2;
-    const radius = 158;
+    const radius = 162;
     
     const textLength = (group.label || `Theme ${groupIndex + 1}`).length;
     const arcSpan = Math.max(0.2, Math.min(0.8, textLength * 0.04));
