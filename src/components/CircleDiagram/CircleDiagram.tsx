@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Group } from './types';
@@ -56,7 +55,7 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
   const pathGenerators = new PathGenerators(config, totalSlices, slicesBeforeGroup);
 
   const handleCenterCircleClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent event bubbling
+    e.stopPropagation();
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
@@ -80,6 +79,29 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
     input.click();
   };
 
+  const getThemeLabelPosition = (groupIndex: number, group: Group) => {
+    const availableAngle = 2 * Math.PI;
+    const startAngle = (slicesBeforeGroup[groupIndex] * (availableAngle / totalSlices));
+    const endAngle = startAngle + (group.slices.length * (availableAngle / totalSlices));
+    const middleAngle = (startAngle + endAngle) / 2;
+    
+    const radius = 172; // Text circle radius
+    const x = config.outerRadius + Math.cos(middleAngle) * radius;
+    const y = config.outerRadius + Math.sin(middleAngle) * radius;
+    
+    let rotationAngle = (middleAngle * 180) / Math.PI;
+    
+    if (rotationAngle > 90 && rotationAngle < 270) {
+      rotationAngle += 180;
+    }
+
+    return {
+      x,
+      y,
+      rotation: rotationAngle
+    };
+  };
+
   return (
     <div className="flex flex-col items-center">
       <TooltipProvider>
@@ -90,7 +112,23 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
             pathGenerators={pathGenerators}
           />
 
-          {/* Outer circle slices */}
+          {groups.map((group, index) => {
+            const position = getThemeLabelPosition(index, group);
+            return (
+              <text
+                key={`theme-label-${index}`}
+                x={position.x}
+                y={position.y}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                transform={`rotate(${position.rotation}, ${position.x}, ${position.y})`}
+                className="text-sm font-medium fill-gray-600"
+              >
+                {group.label || `Theme ${index + 1}`}
+              </text>
+            );
+          })}
+
           {groups.map((group, groupIndex) => (
             group.slices.map((slice, sliceIndex) => (
               <CircleSlice
@@ -105,7 +143,6 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
             ))
           ))}
 
-          {/* Middle circle divided by groups */}
           {groups.map((group, index) => (
             <path
               key={`middle-${index}`}
@@ -117,7 +154,6 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
             />
           ))}
           
-          {/* White center circle with shadow and hover effect */}
           <g 
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
@@ -167,4 +203,3 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
     </div>
   );
 };
-
