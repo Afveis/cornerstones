@@ -86,11 +86,11 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
     const endAngle = startAngle + (group.slices.length * (availableAngle / totalSlices));
     const middleAngle = (startAngle + endAngle) / 2;
     
-    const radius = 172;
+    const radius = 166;
     const x = config.outerRadius + Math.cos(middleAngle) * radius;
     const y = config.outerRadius + Math.sin(middleAngle) * radius;
     
-    let rotationAngle = (middleAngle * 180) / Math.PI + 90; // Added 90 degrees
+    let rotationAngle = (middleAngle * 180) / Math.PI + 90;
     
     if (rotationAngle > 180 && rotationAngle < 360) {
       rotationAngle += 180;
