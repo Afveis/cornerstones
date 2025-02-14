@@ -191,8 +191,8 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
           {groups.map((group, index) => (
             <text
               key={`theme-label-${index}`}
-              className="text-xs font-medium"
-              fill="#000000"
+              className="text-xs font-medium uppercase"
+              fill="white"
               style={{ zIndex: 50 }}
             >
               <textPath
