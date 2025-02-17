@@ -1,4 +1,4 @@
-// Move the content from Index.tsx to here
+
 import React, { useRef, useState } from "react";
 import { CircleDiagram } from "@/components/CircleDiagram/CircleDiagram";
 import { IndicatorCard } from "@/components/CircleDiagram/IndicatorCard";
