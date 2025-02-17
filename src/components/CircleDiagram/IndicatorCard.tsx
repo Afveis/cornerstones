@@ -16,12 +16,12 @@ export const IndicatorCard: React.FC<IndicatorCardProps> = ({
 }) => {
   return (
     <Card
-      className={`p-4 cursor-pointer transition-all hover:scale-105 ${
+      className={`flex-1 p-4 cursor-pointer transition-all hover:scale-105 ${
         isActive ? 'ring-2 ring-primary' : ''
       }`}
       onClick={onClick}
     >
-      <div className="w-20 h-20 relative">
+      <div className="w-full aspect-square relative">
         <img 
           src={indicator.centerImage} 
           alt={`Indicator ${indicator.id}`}

@@ -46,21 +46,17 @@ const Index: React.FC = () => {
       let groups: Group[];
 
       if (newThemeCount !== undefined) {
-        // If theme count is changing, preserve existing theme settings
         if (newThemeCount > prev.groups.length) {
-          // Adding new themes
           const existingGroups = [...prev.groups];
           const newGroups = generateGroups(newThemeCount - prev.groups.length);
           groups = [...existingGroups, ...newGroups];
         } else {
-          // Reducing number of themes
           groups = prev.groups.slice(0, newThemeCount);
         }
       } else {
         groups = prev.groups;
       }
 
-      // Update slice count if needed
       if (newSliceCount !== undefined) {
         groups = groups.map(group => ({
           ...group,
@@ -218,24 +214,30 @@ const Index: React.FC = () => {
 
   return (
     <main className="flex min-h-screen">
-      <div className="flex-1 bg-white fixed left-0 right-[600px] top-0 bottom-0 flex flex-col items-center justify-center">
-        <CircleDiagram 
-          groups={activeIndicatorData.groups}
-          groupCount={globalConfig.themeCount}
-          onUpdateGroupCount={count => updateGlobalConfig(count)}
-          onUpdateGroupConfig={updateThemeConfig}
-          onUpdateProgress={updateSliceProgress}
-          centerImage={activeIndicatorData.centerImage}
-        />
-        <div className="flex gap-4 mt-8">
-          {indicators.map((indicator) => (
-            <IndicatorCard
-              key={indicator.id}
-              indicator={indicator}
-              isActive={activeIndicator === indicator.id}
-              onClick={() => setActiveIndicator(indicator.id)}
+      <div className="flex-1 bg-white fixed left-0 right-[600px] top-0 bottom-0 flex flex-col">
+        <div className="flex-1 flex items-center justify-center p-8">
+          <div className="border border-[#CBCBCB] border-opacity-50 rounded-lg p-8 bg-white">
+            <CircleDiagram 
+              groups={activeIndicatorData.groups}
+              groupCount={globalConfig.themeCount}
+              onUpdateGroupCount={count => updateGlobalConfig(count)}
+              onUpdateGroupConfig={updateThemeConfig}
+              onUpdateProgress={updateSliceProgress}
+              centerImage={activeIndicatorData.centerImage}
             />
-          ))}
+          </div>
+        </div>
+        <div className="px-8 pb-8">
+          <div className="flex gap-4 w-[700px] mx-auto">
+            {indicators.map((indicator) => (
+              <IndicatorCard
+                key={indicator.id}
+                indicator={indicator}
+                isActive={activeIndicator === indicator.id}
+                onClick={() => setActiveIndicator(indicator.id)}
+              />
+            ))}
+          </div>
         </div>
       </div>
       <div className="w-[600px] fixed right-0 top-0 bottom-0 bg-[#F3F3F3]">
