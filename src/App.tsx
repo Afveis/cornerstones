@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Navigation } from "./components/Navigation";
 import Overview from "./pages/Overview";
 import Metrics from "./pages/Metrics";
@@ -17,22 +17,24 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <IndicatorProvider>
-        <BrowserRouter>
-          <Navigation />
-          <div className="pt-[46px]">
-            <Routes>
-              <Route path="/" element={<Overview />} />
-              <Route path="/metrics" element={<Metrics />} />
-              <Route path="/cornerstones" element={<Cornerstones />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </div>
-        </BrowserRouter>
-      </IndicatorProvider>
+      <div className="min-h-screen bg-[#F3F3F3]">
+        <Toaster />
+        <Sonner />
+        <IndicatorProvider>
+          <BrowserRouter>
+            <Navigation />
+            <div className="pt-[62px]">
+              <Routes>
+                <Route path="/" element={<Overview />} />
+                <Route path="/metrics" element={<Metrics />} />
+                <Route path="/cornerstones" element={<Cornerstones />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </div>
+          </BrowserRouter>
+        </IndicatorProvider>
+      </div>
     </TooltipProvider>
   </QueryClientProvider>
 );

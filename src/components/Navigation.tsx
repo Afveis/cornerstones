@@ -13,7 +13,7 @@ export const Navigation = () => {
   ];
 
   return (
-    <nav className="h-[46px] border-b border-[#CBCBCB] bg-white fixed top-2 left-2 right-2 z-50 rounded-lg">
+    <nav className="h-[46px] border border-[#CBCBCB] bg-white fixed m-2 left-0 right-0 z-50 rounded-lg">
       <div className="h-full px-8 flex items-center gap-6">
         {links.map((link) => (
           <Link
