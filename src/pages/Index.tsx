@@ -214,9 +214,9 @@ const Index: React.FC = () => {
 
   return (
     <main className="flex min-h-screen">
-      <div className="flex-1 bg-white fixed left-0 right-[600px] top-0 bottom-0 flex flex-col">
-        <div className="flex-1 flex items-center justify-center p-8">
-          <div className="border border-[#CBCBCB] border-opacity-50 rounded-lg p-8 bg-white">
+      <div className="flex-1 bg-white fixed left-0 right-[600px] top-0 bottom-0 p-8">
+        <div className="w-full h-full flex flex-col">
+          <div className="flex-1 border border-[#CBCBCB] rounded-lg flex items-center justify-center p-8 bg-white">
             <CircleDiagram 
               groups={activeIndicatorData.groups}
               groupCount={globalConfig.themeCount}
@@ -226,17 +226,17 @@ const Index: React.FC = () => {
               centerImage={activeIndicatorData.centerImage}
             />
           </div>
-        </div>
-        <div className="px-8 pb-8">
-          <div className="flex gap-4 w-[700px] mx-auto">
-            {indicators.map((indicator) => (
-              <IndicatorCard
-                key={indicator.id}
-                indicator={indicator}
-                isActive={activeIndicator === indicator.id}
-                onClick={() => setActiveIndicator(indicator.id)}
-              />
-            ))}
+          <div className="mt-8">
+            <div className="flex gap-4 w-[700px] mx-auto">
+              {indicators.map((indicator) => (
+                <IndicatorCard
+                  key={indicator.id}
+                  indicator={indicator}
+                  isActive={activeIndicator === indicator.id}
+                  onClick={() => setActiveIndicator(indicator.id)}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
