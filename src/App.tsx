@@ -24,7 +24,7 @@ const App = () => (
           <BrowserRouter>
             <Navigation />
             <div className="px-2 pt-[62px]">
-              <div className="mt-2">
+              <div className="mt-4">
                 <Routes>
                   <Route path="/" element={<Overview />} />
                   <Route path="/metrics" element={<Metrics />} />
