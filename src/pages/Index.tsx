@@ -214,7 +214,7 @@ const Index: React.FC = () => {
 
   return (
     <main className="flex min-h-screen bg-[#F3F3F3]">
-      <div className="flex-1 fixed left-0 right-[600px] top-0 bottom-0 p-8">
+      <div className="flex-1 fixed left-0 right-[600px] top-0 bottom-0 p-2">
         <div className="w-full h-full flex flex-col">
           <div className="flex-1 border border-[#CBCBCB] rounded-lg flex items-center justify-center p-8 bg-white">
             <CircleDiagram 
@@ -242,7 +242,7 @@ const Index: React.FC = () => {
       </div>
       <div className="w-[600px] fixed right-0 top-0 bottom-0 bg-[#F3F3F3]">
         <ScrollArea className="h-full">
-          <div className="p-8">
+          <div className="p-2">
             <div className="flex flex-col gap-6">
               <h1 className="text-2xl font-bold text-gray-900">Indicator {activeIndicator}</h1>
               <ThemeConfiguration
