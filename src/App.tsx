@@ -23,14 +23,16 @@ const App = () => (
         <IndicatorProvider>
           <BrowserRouter>
             <Navigation />
-            <div className="pt-[62px]">
-              <Routes>
-                <Route path="/" element={<Overview />} />
-                <Route path="/metrics" element={<Metrics />} />
-                <Route path="/cornerstones" element={<Cornerstones />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+            <div className="px-2 pt-[62px]">
+              <div className="mt-2">
+                <Routes>
+                  <Route path="/" element={<Overview />} />
+                  <Route path="/metrics" element={<Metrics />} />
+                  <Route path="/cornerstones" element={<Cornerstones />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </div>
             </div>
           </BrowserRouter>
         </IndicatorProvider>
