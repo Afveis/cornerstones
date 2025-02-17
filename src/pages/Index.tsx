@@ -213,7 +213,7 @@ const Index: React.FC = () => {
   const activeIndicatorData = indicators.find(i => i.id === activeIndicator) || indicators[0];
 
   return (
-    <main className="flex min-h-screen">
+    <main className="flex min-h-screen bg-[#F3F3F3]">
       <div className="flex-1 fixed left-0 right-[600px] top-0 bottom-0 p-8">
         <div className="w-full h-full flex flex-col">
           <div className="flex-1 border border-[#CBCBCB] rounded-lg flex items-center justify-center p-8 bg-white">
@@ -227,7 +227,7 @@ const Index: React.FC = () => {
             />
           </div>
           <div className="mt-8">
-            <div className="flex gap-4 w-[700px] mx-auto">
+            <div className="flex gap-4 w-full">
               {indicators.map((indicator) => (
                 <IndicatorCard
                   key={indicator.id}
