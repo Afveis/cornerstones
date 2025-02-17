@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState } from 'react';
 import { Indicator, GlobalConfig, Group } from '../types';
 import { generateGroups } from '../utils';
@@ -97,13 +96,6 @@ export const IndicatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             color: color !== undefined ? color : group.color,
             rankingColor: rankingColor !== undefined ? rankingColor : group.rankingColor,
             sliceCount: sliceCount !== undefined ? sliceCount : group.sliceCount,
-            slices: sliceCount !== undefined ? Array.from({ length: sliceCount }, (_, i) => ({
-              color: group.color,
-              rankingColor: group.rankingColor,
-              label: `Slice ${i + 1}`,
-              progress: 0,
-              description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam hendrerit nisi sed sollicitudin pellentesque."
-            })) : group.slices,
             label: label !== undefined ? label : group.label,
           };
         }
@@ -113,31 +105,43 @@ export const IndicatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     });
 
     setIndicators((prevIndicators) => {
-      return prevIndicators.map((indicator) => {
-        if (indicator.id === activeIndicator) {
-          const updatedGroups = indicator.groups.map((group, i) => {
-            if (i === themeIndex) {
-              return {
-                ...group,
-                color: color !== undefined ? color : group.color,
-                rankingColor: rankingColor !== undefined ? rankingColor : group.rankingColor,
-                sliceCount: sliceCount !== undefined ? sliceCount : group.sliceCount,
-                slices: sliceCount !== undefined ? Array.from({ length: sliceCount }, (_, i) => ({
-                  color: group.color,
-                  rankingColor: group.rankingColor,
-                  label: `Slice ${i + 1}`,
+      return prevIndicators.map((indicator) => ({
+        ...indicator,
+        groups: indicator.groups.map((group, i) => {
+          if (i === themeIndex) {
+            const updatedGroup = {
+              ...group,
+              color: color !== undefined ? color : group.color,
+              rankingColor: rankingColor !== undefined ? rankingColor : group.rankingColor,
+              sliceCount: sliceCount !== undefined ? sliceCount : group.sliceCount,
+              label: label !== undefined ? label : group.label,
+            };
+            
+            if (sliceCount !== undefined) {
+              const newSlices = Array.from({ length: sliceCount }, (_, index) => {
+                if (index < group.slices.length) {
+                  return {
+                    ...group.slices[index],
+                    color: updatedGroup.color,
+                    rankingColor: updatedGroup.rankingColor,
+                  };
+                }
+                return {
+                  color: updatedGroup.color,
+                  rankingColor: updatedGroup.rankingColor,
+                  label: `Slice ${index + 1}`,
                   progress: 0,
                   description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam hendrerit nisi sed sollicitudin pellentesque."
-                })) : group.slices,
-                label: label !== undefined ? label : group.label,
-              };
+                };
+              });
+              updatedGroup.slices = newSlices;
             }
-            return group;
-          });
-          return { ...indicator, groups: updatedGroups };
-        }
-        return indicator;
-      });
+            
+            return updatedGroup;
+          }
+          return group;
+        })
+      }));
     });
   };
 
@@ -146,7 +150,23 @@ export const IndicatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       const updatedThemeCount = newThemeCount !== undefined ? newThemeCount : prevConfig.themeCount;
       const updatedSliceCount = newSliceCount !== undefined ? newSliceCount : prevConfig.sliceCount;
   
-      const updatedGroups = generateGroups(updatedThemeCount, prevConfig.groups);
+      const updatedGroups = Array.from({ length: updatedThemeCount }, (_, index) => {
+        if (index < prevConfig.groups.length) {
+          return prevConfig.groups[index];
+        }
+        const newGroup = generateGroups(1)[0];
+        return {
+          ...newGroup,
+          sliceCount: updatedSliceCount,
+          slices: Array.from({ length: updatedSliceCount }, (_, i) => ({
+            color: newGroup.color,
+            rankingColor: newGroup.rankingColor,
+            label: `Slice ${i + 1}`,
+            progress: 0,
+            description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam hendrerit nisi sed sollicitudin pellentesque."
+          }))
+        };
+      });
   
       return {
         themeCount: updatedThemeCount,
@@ -156,13 +176,24 @@ export const IndicatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     });
   
     setIndicators((prevIndicators) => {
-      return prevIndicators.map((indicator) => {
-        if (indicator.id === activeIndicator) {
-          const updatedGroups = generateGroups(newThemeCount || globalConfig.themeCount, indicator.groups);
-          return { ...indicator, groups: updatedGroups };
-        }
-        return indicator;
-      });
+      return prevIndicators.map((indicator) => ({
+        ...indicator,
+        groups: globalConfig.groups.map(group => ({
+          ...group,
+          slices: Array.from({ length: group.sliceCount }, (_, i) => {
+            if (i < group.slices.length) {
+              return group.slices[i];
+            }
+            return {
+              color: group.color,
+              rankingColor: group.rankingColor,
+              label: `Slice ${i + 1}`,
+              progress: 0,
+              description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam hendrerit nisi sed sollicitudin pellentesque."
+            };
+          })
+        }))
+      }));
     });
   };
 
@@ -170,7 +201,7 @@ export const IndicatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setIndicators((prevIndicators) => {
       return prevIndicators.map((indicator) => {
         if (indicator.id === id) {
-          return { ...indicator, name: name };
+          return { ...indicator, name };
         }
         return indicator;
       });
