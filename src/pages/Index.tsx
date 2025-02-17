@@ -226,8 +226,8 @@ const Index: React.FC = () => {
               centerImage={activeIndicatorData.centerImage}
             />
           </div>
-          <div className="mt-8">
-            <div className="flex gap-4 w-full">
+          <div className="mt-2">
+            <div className="flex gap-2 w-full">
               {indicators.map((indicator) => (
                 <IndicatorCard
                   key={indicator.id}
