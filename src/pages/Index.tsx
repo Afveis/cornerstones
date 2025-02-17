@@ -214,7 +214,7 @@ const Index: React.FC = () => {
 
   return (
     <main className="flex min-h-screen">
-      <div className="flex-1 bg-white fixed left-0 right-[600px] top-0 bottom-0 p-8">
+      <div className="flex-1 fixed left-0 right-[600px] top-0 bottom-0 p-8">
         <div className="w-full h-full flex flex-col">
           <div className="flex-1 border border-[#CBCBCB] rounded-lg flex items-center justify-center p-8 bg-white">
             <CircleDiagram 
