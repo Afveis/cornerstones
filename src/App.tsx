@@ -10,6 +10,7 @@ import Metrics from "./pages/Metrics";
 import Cornerstones from "./pages/Cornerstones";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+import { IndicatorProvider } from "./components/CircleDiagram/context/IndicatorContext";
 
 const queryClient = new QueryClient();
 
@@ -18,18 +19,20 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Navigation />
-        <div className="pt-[46px]">
-          <Routes>
-            <Route path="/" element={<Overview />} />
-            <Route path="/metrics" element={<Metrics />} />
-            <Route path="/cornerstones" element={<Cornerstones />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </div>
-      </BrowserRouter>
+      <IndicatorProvider>
+        <BrowserRouter>
+          <Navigation />
+          <div className="pt-[46px]">
+            <Routes>
+              <Route path="/" element={<Overview />} />
+              <Route path="/metrics" element={<Metrics />} />
+              <Route path="/cornerstones" element={<Cornerstones />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </div>
+        </BrowserRouter>
+      </IndicatorProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

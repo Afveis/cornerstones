@@ -17,6 +17,7 @@ export interface Group {
 
 export interface Indicator {
   id: number;
+  name: string;
   centerImage: string;
   groups: Group[];
 }
