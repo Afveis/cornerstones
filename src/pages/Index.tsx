@@ -227,7 +227,7 @@ const Index: React.FC = () => {
             />
           </div>
           <div className="mt-2">
-            <div className="flex gap-2 w-full max-h-[260px] overflow-hidden">
+            <div className="flex gap-2 w-full">
               {indicators.map((indicator) => (
                 <IndicatorCard
                   key={indicator.id}
