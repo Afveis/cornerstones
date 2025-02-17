@@ -91,56 +91,42 @@ export const useIndicatorActions = (
   }, [setGlobalConfig, setIndicators]);
 
   const updateGlobalConfig = useCallback((newThemeCount?: number, newSliceCount?: number) => {
+    if (newThemeCount !== undefined && (newThemeCount < 1 || newThemeCount > 10)) {
+      return; // Prevent invalid theme counts
+    }
+    
     setGlobalConfig((prevConfig) => {
       const updatedThemeCount = newThemeCount !== undefined ? newThemeCount : prevConfig.themeCount;
       const updatedSliceCount = newSliceCount !== undefined ? newSliceCount : prevConfig.sliceCount;
-  
-      const updatedGroups = Array.from({ length: updatedThemeCount }, (_, index) => {
-        if (index < prevConfig.groups.length) {
-          return prevConfig.groups[index];
+      
+      let updatedGroups;
+      if (newThemeCount !== undefined) {
+        if (newThemeCount > prevConfig.groups.length) {
+          // Adding new themes
+          const additionalGroups = generateGroups(newThemeCount - prevConfig.groups.length);
+          updatedGroups = [...prevConfig.groups, ...additionalGroups];
+        } else {
+          // Removing themes
+          updatedGroups = prevConfig.groups.slice(0, newThemeCount);
         }
-        const newGroup = generateGroups(1)[0];
-        return {
-          ...newGroup,
-          sliceCount: updatedSliceCount,
-          slices: Array.from({ length: updatedSliceCount }, (_, i) => ({
-            color: newGroup.color,
-            rankingColor: newGroup.rankingColor,
-            label: `Slice ${i + 1}`,
-            progress: 0,
-            description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam hendrerit nisi sed sollicitudin pellentesque."
-          }))
-        };
-      });
-  
+      } else {
+        updatedGroups = prevConfig.groups;
+      }
+      
       return {
         themeCount: updatedThemeCount,
         sliceCount: updatedSliceCount,
         groups: updatedGroups,
       };
     });
-  
+
     setIndicators((prevIndicators) => {
       return prevIndicators.map((indicator) => ({
         ...indicator,
-        groups: globalConfig.groups.map((group: Group) => ({
-          ...group,
-          slices: Array.from({ length: group.sliceCount }, (_, i) => {
-            if (i < group.slices.length) {
-              return group.slices[i];
-            }
-            return {
-              color: group.color,
-              rankingColor: group.rankingColor,
-              label: `Slice ${i + 1}`,
-              progress: 0,
-              description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam hendrerit nisi sed sollicitudin pellentesque."
-            };
-          })
-        }))
+        groups: indicator.groups.slice(0, newThemeCount)
       }));
     });
-  }, [setGlobalConfig, setIndicators, globalConfig.groups]);
+  }, [setGlobalConfig, setIndicators]);
 
   const updateIndicatorName = useCallback((id: number, name: string) => {
     setIndicators((prevIndicators) => {
