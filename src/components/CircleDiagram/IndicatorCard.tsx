@@ -21,14 +21,16 @@ export const IndicatorCard: React.FC<IndicatorCardProps> = ({
       }`}
       onClick={onClick}
     >
-      <div className="w-full aspect-square relative">
-        <img 
-          src={indicator.centerImage} 
-          alt={`Indicator ${indicator.id}`}
-          className="w-full h-full object-contain"
-        />
+      <div className="h-full flex flex-col">
+        <div className="flex-1 relative aspect-square">
+          <img 
+            src={indicator.centerImage} 
+            alt={`Indicator ${indicator.id}`}
+            className="w-full h-full object-contain"
+          />
+        </div>
+        <p className="mt-2 text-center truncate">Indicator {indicator.id}</p>
       </div>
-      <p className="text-center mt-2">Indicator {indicator.id}</p>
     </Card>
   );
 };
