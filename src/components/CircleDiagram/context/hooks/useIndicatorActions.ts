@@ -121,10 +121,26 @@ export const useIndicatorActions = (
     });
 
     setIndicators((prevIndicators) => {
-      return prevIndicators.map((indicator) => ({
-        ...indicator,
-        groups: indicator.groups.slice(0, newThemeCount)
-      }));
+      return prevIndicators.map((indicator) => {
+        const currentGroups = [...indicator.groups];
+        if (newThemeCount !== undefined) {
+          if (newThemeCount > currentGroups.length) {
+            // Add new groups
+            const additionalGroups = generateGroups(newThemeCount - currentGroups.length);
+            return {
+              ...indicator,
+              groups: [...currentGroups, ...additionalGroups],
+            };
+          } else {
+            // Remove excess groups
+            return {
+              ...indicator,
+              groups: currentGroups.slice(0, newThemeCount),
+            };
+          }
+        }
+        return indicator;
+      });
     });
   }, [setGlobalConfig, setIndicators]);
 
