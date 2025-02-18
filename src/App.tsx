@@ -22,13 +22,20 @@ const App = () => (
         <Sonner />
         <IndicatorProvider>
           <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Overview />} />
-              <Route path="/metrics" element={<Metrics />} />
-              <Route path="/cornerstones" element={<Cornerstones />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <div className="flex h-screen bg-[#F3F3F3] p-2">
+              <div className="flex-1 flex flex-col gap-2">
+                <Navigation />
+                <div className="flex-1">
+                  <Routes>
+                    <Route path="/" element={<Overview />} />
+                    <Route path="/metrics" element={<Metrics />} />
+                    <Route path="/cornerstones" element={<Cornerstones />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </div>
+              </div>
+            </div>
           </BrowserRouter>
         </IndicatorProvider>
       </div>
