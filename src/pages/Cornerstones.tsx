@@ -5,7 +5,7 @@ import { ConfigPanel } from "@/components/CircleDiagram/components/ConfigPanel";
 
 const Cornerstones = () => {
   return (
-    <div className="flex-1 flex">
+    <div className="h-full flex">
       <div className="flex-1">
         <DiagramSection />
       </div>

@@ -17,15 +17,15 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <div className="min-h-screen bg-[#F3F3F3]">
+      <div className="h-screen bg-[#F3F3F3]">
         <Toaster />
         <Sonner />
         <IndicatorProvider>
           <BrowserRouter>
-            <div className="flex h-screen bg-[#F3F3F3] p-2">
-              <div className="flex-1 flex flex-col gap-2">
+            <div className="h-full p-2">
+              <div className="h-full flex flex-col gap-2">
                 <Navigation />
-                <div className="flex-1">
+                <div className="flex-1 min-h-0">
                   <Routes>
                     <Route path="/" element={<Overview />} />
                     <Route path="/metrics" element={<Metrics />} />
