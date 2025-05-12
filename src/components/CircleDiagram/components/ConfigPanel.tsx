@@ -4,27 +4,19 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ThemeConfiguration } from '../ThemeConfiguration';
 import { IndicatorControls } from '../IndicatorControls';
 import { useIndicator } from '../context/IndicatorContext';
-import { Button } from "@/components/ui/button";
-import { LoginButton } from "@/components/Auth/LoginButton";
-import { useAuth } from '@/context/AuthContext';
-import { useToast } from "@/hooks/use-toast";
 
 export const ConfigPanel = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
   const {
     activeIndicator,
     activeIndicatorData,
     globalConfig,
-    indicators,
     updateGlobalConfig,
     updateThemeConfig,
     updateSliceProgress,
     updateIndicatorName,
     updateSliceLabel,
   } = useIndicator();
-
-  const { user, saveUserData } = useAuth();
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -44,46 +36,11 @@ export const ConfigPanel = () => {
     }
   };
 
-  const handleSaveProgress = async () => {
-    if (!user) {
-      toast({
-        title: "Not signed in",
-        description: "Please sign in to save your progress.",
-      });
-      return;
-    }
-
-    try {
-      await saveUserData(indicators);
-      toast({
-        title: "Progress saved",
-        description: "Your progress has been saved successfully.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error saving progress",
-        description: "There was an error saving your progress.",
-        variant: "destructive",
-      });
-    }
-  };
-
   return (
     <ScrollArea className="h-full">
       <div className="p-2">
         <div className="flex flex-col gap-6">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900">Indicator {activeIndicator}</h1>
-            <div className="flex gap-2">
-              <LoginButton />
-              {user && (
-                <Button onClick={handleSaveProgress} variant="default">
-                  Save Progress
-                </Button>
-              )}
-            </div>
-          </div>
-          
+          <h1 className="text-2xl font-bold text-gray-900">Indicator {activeIndicator}</h1>
           <ThemeConfiguration
             globalConfig={globalConfig}
             onUpdateGlobalConfig={updateGlobalConfig}
