@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Group } from './types';
@@ -165,7 +166,7 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
             <path
               key={`middle-${index}`}
               d={pathGenerators.createMiddleCirclePath(index, group.slices.length)}
-              fill={group.color}
+              fill={group.rankingColor}
               stroke="white"
               strokeWidth={config.strokeWidth}
               className="transition-opacity"

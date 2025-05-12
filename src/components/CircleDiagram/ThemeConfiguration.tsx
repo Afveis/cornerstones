@@ -91,12 +91,12 @@ export const ThemeConfiguration: React.FC<ThemeConfigurationProps> = ({
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div className="flex items-center gap-1">
-                      <span className="text-sm">Ranking & Middle Circle Color:</span>
+                      <span className="text-sm">Middle Circle Color:</span>
                       <Info className="h-4 w-4 text-gray-400" />
                     </div>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p className="text-xs max-w-xs">This color is used for both the ranking progress and the middle circle of each theme.</p>
+                    <p className="text-xs max-w-xs">This color is used for the middle circle and progress indicators.</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
