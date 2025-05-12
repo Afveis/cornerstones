@@ -4,6 +4,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ThemeConfiguration } from '../ThemeConfiguration';
 import { IndicatorControls } from '../IndicatorControls';
 import { useIndicator } from '../context/IndicatorContext';
+import { Button } from "@/components/ui/button";
+import { useAuth } from '@/context/AuthContext';
+import { AuthButton } from '@/components/Auth/AuthButton';
+import { Save } from 'lucide-react';
 
 export const ConfigPanel = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -16,7 +20,10 @@ export const ConfigPanel = () => {
     updateSliceProgress,
     updateIndicatorName,
     updateSliceLabel,
+    saveProgress,
   } = useIndicator();
+
+  const { user } = useAuth();
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -40,7 +47,23 @@ export const ConfigPanel = () => {
     <ScrollArea className="h-full">
       <div className="p-2">
         <div className="flex flex-col gap-6">
-          <h1 className="text-2xl font-bold text-gray-900">Indicator {activeIndicator}</h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold text-gray-900">Indicator {activeIndicator}</h1>
+            <div className="flex items-center gap-2">
+              {user && (
+                <Button 
+                  onClick={saveProgress}
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <Save className="h-4 w-4" />
+                  Save Progress
+                </Button>
+              )}
+              <AuthButton />
+            </div>
+          </div>
+          
           <ThemeConfiguration
             globalConfig={globalConfig}
             onUpdateGlobalConfig={updateGlobalConfig}

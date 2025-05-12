@@ -1,8 +1,10 @@
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Indicator, GlobalConfig } from '../types';
 import { initialIndicators, initialGlobalConfig } from './initialState';
 import { useIndicatorActions } from './hooks/useIndicatorActions';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface IndicatorContextType {
   indicators: Indicator[];
@@ -17,6 +19,8 @@ interface IndicatorContextType {
   updateGlobalConfig: (newThemeCount?: number, newSliceCount?: number) => void;
   updateIndicatorName: (id: number, name: string) => void;
   updateSliceLabel: (groupIndex: number, sliceIndex: number, label: string) => void;
+  saveProgress: () => Promise<void>;
+  loadingUserData: boolean;
 }
 
 const IndicatorContext = createContext<IndicatorContextType | undefined>(undefined);
@@ -25,6 +29,8 @@ export const IndicatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [indicators, setIndicators] = useState<Indicator[]>(initialIndicators);
   const [activeIndicator, setActiveIndicator] = useState<number>(1);
   const [globalConfig, setGlobalConfig] = useState<GlobalConfig>(initialGlobalConfig);
+  const [loadingUserData, setLoadingUserData] = useState<boolean>(false);
+  const { user, saveIndicatorData } = useAuth();
 
   const activeIndicatorData = indicators.find((indicator) => indicator.id === activeIndicator) || indicators[0];
 
@@ -34,6 +40,46 @@ export const IndicatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     activeIndicator,
     globalConfig
   );
+
+  // Load user data when user signs in
+  useEffect(() => {
+    async function loadUserData() {
+      if (!user) return;
+
+      try {
+        setLoadingUserData(true);
+        const { data, error } = await supabase
+          .from('user_indicators')
+          .select('indicator_data')
+          .eq('user_id', user.id)
+          .single();
+
+        if (error) {
+          if (error.code !== 'PGRST116') { // No rows returned
+            console.error('Error loading user data:', error);
+          }
+          return;
+        }
+
+        if (data && data.indicator_data) {
+          setIndicators(data.indicator_data);
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      } finally {
+        setLoadingUserData(false);
+      }
+    }
+
+    loadUserData();
+  }, [user]);
+
+  // Function to save indicator progress
+  const saveProgress = async () => {
+    if (user) {
+      await saveIndicatorData(indicators);
+    }
+  };
 
   return (
     <IndicatorContext.Provider
@@ -45,7 +91,9 @@ export const IndicatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         globalConfig,
         setGlobalConfig,
         activeIndicatorData,
-        ...actions
+        ...actions,
+        saveProgress,
+        loadingUserData
       }}
     >
       {children}

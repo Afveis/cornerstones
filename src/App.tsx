@@ -11,6 +11,7 @@ import Cornerstones from "./pages/Cornerstones";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import { IndicatorProvider } from "./components/CircleDiagram/context/IndicatorContext";
+import { AuthProvider } from "./context/AuthContext";
 
 const queryClient = new QueryClient();
 
@@ -20,24 +21,26 @@ const App = () => (
       <div className="h-screen bg-[#F3F3F3]">
         <Toaster />
         <Sonner />
-        <IndicatorProvider>
-          <BrowserRouter>
-            <div className="h-full p-2">
-              <div className="h-full flex flex-col gap-2">
-                <Navigation />
-                <div className="flex-1 min-h-0">
-                  <Routes>
-                    <Route path="/" element={<Overview />} />
-                    <Route path="/metrics" element={<Metrics />} />
-                    <Route path="/cornerstones" element={<Cornerstones />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
+        <AuthProvider>
+          <IndicatorProvider>
+            <BrowserRouter>
+              <div className="h-full p-2">
+                <div className="h-full flex flex-col gap-2">
+                  <Navigation />
+                  <div className="flex-1 min-h-0">
+                    <Routes>
+                      <Route path="/" element={<Overview />} />
+                      <Route path="/metrics" element={<Metrics />} />
+                      <Route path="/cornerstones" element={<Cornerstones />} />
+                      <Route path="/dashboard" element={<Dashboard />} />
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </div>
                 </div>
               </div>
-            </div>
-          </BrowserRouter>
-        </IndicatorProvider>
+            </BrowserRouter>
+          </IndicatorProvider>
+        </AuthProvider>
       </div>
     </TooltipProvider>
   </QueryClientProvider>
