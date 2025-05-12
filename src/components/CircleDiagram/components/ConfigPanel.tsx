@@ -7,7 +7,7 @@ import { useIndicator } from '../context/IndicatorContext';
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/context/AuthContext';
 import { AuthButton } from '@/components/Auth/AuthButton';
-import { Save } from 'lucide-react';
+import { Save, Loader2 } from 'lucide-react';
 
 export const ConfigPanel = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -21,9 +21,10 @@ export const ConfigPanel = () => {
     updateIndicatorName,
     updateSliceLabel,
     saveProgress,
+    loadingUserData
   } = useIndicator();
 
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -55,8 +56,13 @@ export const ConfigPanel = () => {
                   onClick={saveProgress}
                   size="sm"
                   className="flex items-center gap-2"
+                  disabled={loading || loadingUserData}
                 >
-                  <Save className="h-4 w-4" />
+                  {loading || loadingUserData ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Save className="h-4 w-4" />
+                  )}
                   Save Progress
                 </Button>
               )}

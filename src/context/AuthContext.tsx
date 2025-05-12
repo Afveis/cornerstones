@@ -7,9 +7,11 @@ import { useToast } from "@/hooks/use-toast";
 interface AuthContextType {
   session: Session | null;
   user: User | null;
-  signIn: () => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   saveIndicatorData: (data: any) => Promise<void>;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -17,6 +19,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -24,6 +27,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      setLoading(false);
     });
 
     // Listen for auth changes
@@ -37,37 +41,67 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  async function signIn() {
+  async function signUp(email: string, password: string) {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin,
-        }
+      setLoading(true);
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
       });
       
       if (error) throw error;
-    } catch (error) {
+      
+      toast({
+        title: "Account created",
+        description: "Check your email for the confirmation link.",
+      });
+    } catch (error: any) {
+      console.error('Error signing up:', error);
+      toast({
+        title: "Sign Up Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function signIn(email: string, password: string) {
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) throw error;
+    } catch (error: any) {
       console.error('Error signing in:', error);
       toast({
         title: "Authentication Failed",
-        description: "Could not sign in with Google. Please try again.",
+        description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   }
 
   async function signOut() {
     try {
+      setLoading(true);
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error signing out:', error);
       toast({
         title: "Sign Out Failed",
-        description: "Could not sign out. Please try again.",
+        description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -98,18 +132,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         title: "Success",
         description: "Your progress has been saved.",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving data:', error);
       toast({
         title: "Save Failed",
-        description: "Could not save your progress. Please try again.",
+        description: error.message,
         variant: "destructive",
       });
     }
   }
 
   return (
-    <AuthContext.Provider value={{ session, user, signIn, signOut, saveIndicatorData }}>
+    <AuthContext.Provider value={{ 
+      session, 
+      user, 
+      signIn, 
+      signUp, 
+      signOut, 
+      saveIndicatorData,
+      loading
+    }}>
       {children}
     </AuthContext.Provider>
   );
