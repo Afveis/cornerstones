@@ -16,6 +16,7 @@ interface IndicatorContextType {
   updateThemeConfig: (themeIndex: number, color?: string, rankingColor?: string, sliceCount?: number, label?: string) => void;
   updateGlobalConfig: (newThemeCount?: number, newSliceCount?: number) => void;
   updateIndicatorName: (id: number, name: string) => void;
+  updateSliceLabel: (groupIndex: number, sliceIndex: number, label: string) => void;
 }
 
 const IndicatorContext = createContext<IndicatorContextType | undefined>(undefined);

@@ -8,7 +8,9 @@ import { Group, Slice } from '../types';
 import { PathGenerators } from '../PathGenerators';
 import { SliceTooltip } from './SliceTooltip';
 import { Button } from "@/components/ui/button";
-import { Plus, Minus } from "lucide-react";
+import { Plus, Minus, Pencil } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { useIndicator } from '../context/IndicatorContext';
 
 interface CircleSliceProps {
   group: Group;
@@ -31,6 +33,9 @@ export const CircleSlice: React.FC<CircleSliceProps> = ({
   config,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isEditingLabel, setIsEditingLabel] = useState(false);
+  const [editLabel, setEditLabel] = useState(slice.label);
+  const { updateSliceLabel } = useIndicator();
 
   const handleProgressChange = (increment: boolean, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -44,6 +49,26 @@ export const CircleSlice: React.FC<CircleSliceProps> = ({
       }
     });
     fileInput?.dispatchEvent(changeEvent);
+  };
+
+  const handleLabelEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsEditingLabel(true);
+  };
+
+  const handleLabelSave = (e: React.MouseEvent | React.FocusEvent | React.KeyboardEvent) => {
+    e.stopPropagation();
+    updateSliceLabel(groupIndex, sliceIndex, editLabel);
+    setIsEditingLabel(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleLabelSave(e);
+    } else if (e.key === 'Escape') {
+      setEditLabel(slice.label);
+      setIsEditingLabel(false);
+    }
   };
 
   return (
@@ -112,9 +137,47 @@ export const CircleSlice: React.FC<CircleSliceProps> = ({
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    className="h-8 w-8 rounded-full bg-white/80 hover:bg-white"
+                    onClick={handleLabelEdit}
+                    style={{ pointerEvents: 'auto' }}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
                 </div>
               </foreignObject>
             </>
+          )}
+
+          {isEditingLabel && (
+            <foreignObject
+              x={pathGenerators.getSliceCenter(sliceIndex, groupIndex).x - 100}
+              y={pathGenerators.getSliceCenter(sliceIndex, groupIndex).y - 70}
+              width={200}
+              height={40}
+              style={{ pointerEvents: 'none' }}
+            >
+              <div className="flex items-center gap-2 bg-white/90 p-2 rounded shadow-md" style={{ pointerEvents: 'auto' }}>
+                <Input
+                  value={editLabel}
+                  onChange={(e) => setEditLabel(e.target.value)}
+                  onBlur={handleLabelSave}
+                  onKeyDown={handleKeyDown}
+                  autoFocus
+                  className="h-8"
+                  placeholder="Slice name"
+                />
+                <Button
+                  size="sm"
+                  onClick={handleLabelSave}
+                  className="h-8"
+                >
+                  Save
+                </Button>
+              </div>
+            </foreignObject>
           )}
         </g>
       </TooltipTrigger>

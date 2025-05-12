@@ -15,6 +15,7 @@ export const ConfigPanel = () => {
     updateThemeConfig,
     updateSliceProgress,
     updateIndicatorName,
+    updateSliceLabel,
   } = useIndicator();
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,6 +56,7 @@ export const ConfigPanel = () => {
             onImageUpload={handleImageUpload}
             fileInputRef={fileInputRef}
             onUpdateIndicatorName={updateIndicatorName}
+            onUpdateSliceLabel={updateSliceLabel}
           />
         </div>
       </div>

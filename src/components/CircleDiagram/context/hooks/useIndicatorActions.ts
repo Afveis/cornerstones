@@ -155,10 +155,34 @@ export const useIndicatorActions = (
     });
   }, [setIndicators]);
 
+  const updateSliceLabel = useCallback((groupIndex: number, sliceIndex: number, label: string) => {
+    setIndicators((prevIndicators) => {
+      return prevIndicators.map((indicator) => {
+        if (indicator.id === activeIndicator) {
+          const updatedGroups = indicator.groups.map((group: Group, i: number) => {
+            if (i === groupIndex) {
+              const updatedSlices = group.slices.map((slice, j) => {
+                if (j === sliceIndex) {
+                  return { ...slice, label };
+                }
+                return slice;
+              });
+              return { ...group, slices: updatedSlices };
+            }
+            return group;
+          });
+          return { ...indicator, groups: updatedGroups };
+        }
+        return indicator;
+      });
+    });
+  }, [activeIndicator, setIndicators]);
+
   return {
     updateSliceProgress,
     updateThemeConfig,
     updateGlobalConfig,
     updateIndicatorName,
+    updateSliceLabel,
   };
 };
