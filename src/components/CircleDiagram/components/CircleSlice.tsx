@@ -54,13 +54,15 @@ export const CircleSlice: React.FC<CircleSliceProps> = ({
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
+          {/* Base slice with fill */}
           <path
             d={pathGenerators.createSlicePath(sliceIndex, groupIndex)}
             fill={group.color}
-            stroke="white"
-            strokeWidth={config.strokeWidth}
+            stroke="none"
             className="hover:opacity-90 transition-opacity"
           />
+          
+          {/* Ranking circles */}
           {Array.from({ length: slice.progress }, (_, i) => (
             <path
               key={`progress-${groupIndex}-${sliceIndex}-${i}`}
@@ -68,9 +70,18 @@ export const CircleSlice: React.FC<CircleSliceProps> = ({
               stroke={group.rankingColor}
               strokeWidth={config.rankingStrokeWidth}
               fill="none"
-              clipPath={`url(#slice-clip-${groupIndex}-${sliceIndex})`}
             />
           ))}
+          
+          {/* Duplicate slice with no fill - only stroke */}
+          <path
+            d={pathGenerators.createSlicePath(sliceIndex, groupIndex)}
+            fill="none"
+            stroke="white"
+            strokeWidth={config.strokeWidth}
+            className="transition-opacity"
+          />
+          
           {isHovered && (
             <>
               <foreignObject
