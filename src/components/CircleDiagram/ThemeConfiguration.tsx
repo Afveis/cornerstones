@@ -2,6 +2,9 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Group, GlobalConfig } from "./types";
+import { Label } from "@/components/ui/label";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
 
 interface ThemeConfigurationProps {
   globalConfig: GlobalConfig;
@@ -84,7 +87,19 @@ export const ThemeConfiguration: React.FC<ThemeConfigurationProps> = ({
               />
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm">Ranking Color:</span>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm">Ranking & Middle Circle Color:</span>
+                      <Info className="h-4 w-4 text-gray-400" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-xs max-w-xs">This color is used for both the ranking progress and the middle circle of each theme.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               <input
                 type="color"
                 value={theme.rankingColor}

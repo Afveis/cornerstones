@@ -62,16 +62,18 @@ export const IndicatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         }
 
         if (data && data.indicator_data) {
-          // Use a more strongly typed approach to handle the JSON data
-          const indicatorData = data.indicator_data;
+          // Use proper type casting to handle the JSON data
+          const indicatorData = data.indicator_data as unknown;
           
-          // Verify the data has the expected structure before setting it
           if (Array.isArray(indicatorData) && 
               indicatorData.length > 0 && 
+              typeof indicatorData[0] === 'object' && 
+              indicatorData[0] !== null &&
               'id' in indicatorData[0] && 
               'name' in indicatorData[0] && 
               'groups' in indicatorData[0]) {
-            setIndicators(indicatorData as Indicator[]);
+            // Cast to Indicator[] after validation
+            setIndicators(indicatorData as unknown as Indicator[]);
           } else {
             console.error('Loaded data does not match expected Indicator structure', indicatorData);
           }

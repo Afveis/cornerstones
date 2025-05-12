@@ -36,10 +36,12 @@ export const useIndicatorActions = (
     setGlobalConfig((prevConfig) => {
       const updatedGroups = prevConfig.groups.map((group: Group, i: number) => {
         if (i === themeIndex) {
+          // Update the middle circle color to be the same as ranking color
+          const newRankingColor = rankingColor !== undefined ? rankingColor : group.rankingColor;
           return {
             ...group,
             color: color !== undefined ? color : group.color,
-            rankingColor: rankingColor !== undefined ? rankingColor : group.rankingColor,
+            rankingColor: newRankingColor,
             sliceCount: sliceCount !== undefined ? sliceCount : group.sliceCount,
             label: label !== undefined ? label : group.label,
           };
@@ -54,10 +56,12 @@ export const useIndicatorActions = (
         ...indicator,
         groups: indicator.groups.map((group: Group, i: number) => {
           if (i === themeIndex) {
+            // Set the middle circle color to be the same as ranking color for active indicator
+            const newRankingColor = rankingColor !== undefined ? rankingColor : group.rankingColor;
             const updatedGroup = {
               ...group,
-              color: color !== undefined ? color : group.color,
-              rankingColor: rankingColor !== undefined ? rankingColor : group.rankingColor,
+              color: rankingColor !== undefined ? rankingColor : (color !== undefined ? color : group.color),
+              rankingColor: newRankingColor,
               sliceCount: sliceCount !== undefined ? sliceCount : group.sliceCount,
               label: label !== undefined ? label : group.label,
             };
