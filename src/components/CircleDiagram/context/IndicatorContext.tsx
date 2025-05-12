@@ -62,7 +62,9 @@ export const IndicatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         }
 
         if (data && data.indicator_data) {
-          setIndicators(data.indicator_data);
+          // Ensure the data is properly typed as Indicator[]
+          const typedIndicatorData = data.indicator_data as Indicator[];
+          setIndicators(typedIndicatorData);
         }
       } catch (error) {
         console.error('Error loading user data:', error);
