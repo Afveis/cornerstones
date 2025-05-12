@@ -54,18 +54,6 @@ export const CircleSlice: React.FC<CircleSliceProps> = ({
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          {/* First render the ranking indicators behind everything */}
-          {Array.from({ length: slice.progress }, (_, i) => (
-            <path
-              key={`progress-${groupIndex}-${sliceIndex}-${i}`}
-              d={pathGenerators.createProgressCirclePath(sliceIndex, groupIndex, i + 1)}
-              stroke={group.rankingColor}
-              strokeWidth={config.rankingStrokeWidth}
-              fill="none"
-            />
-          ))}
-          
-          {/* Then render the slice on top of the ranking indicators */}
           <path
             d={pathGenerators.createSlicePath(sliceIndex, groupIndex)}
             fill={group.color}
@@ -73,7 +61,16 @@ export const CircleSlice: React.FC<CircleSliceProps> = ({
             strokeWidth={config.strokeWidth}
             className="hover:opacity-90 transition-opacity"
           />
-          
+          {Array.from({ length: slice.progress }, (_, i) => (
+            <path
+              key={`progress-${groupIndex}-${sliceIndex}-${i}`}
+              d={pathGenerators.createProgressCirclePath(sliceIndex, groupIndex, i + 1)}
+              stroke={group.rankingColor}
+              strokeWidth={config.rankingStrokeWidth}
+              fill="none"
+              clipPath={`url(#slice-clip-${groupIndex}-${sliceIndex})`}
+            />
+          ))}
           {isHovered && (
             <>
               <foreignObject
