@@ -1,13 +1,11 @@
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Group } from './types';
 import { PathGenerators } from './PathGenerators';
 import { CircleSlice } from './components/CircleSlice';
 import { CircleDefinitions } from './components/CircleDefinitions';
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { Copy } from "lucide-react";
 
 interface CircleDiagramProps {
   groups: Group[];
@@ -25,7 +23,6 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
   centerImage,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
     const handleProgressChange = (event: Event) => {
@@ -83,63 +80,6 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
     input.click();
   };
 
-  const copyAsPNG = async () => {
-    if (!svgRef.current) return;
-    
-    try {
-      // Create a canvas with the same dimensions as the SVG
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        toast.error("Failed to create canvas context");
-        return;
-      }
-      
-      // Set canvas dimensions
-      canvas.width = config.svgSize;
-      canvas.height = config.svgSize;
-      
-      // Get SVG data as a string
-      const svgData = new XMLSerializer().serializeToString(svgRef.current);
-      
-      // Create a Blob from the SVG data
-      const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-      const URL = window.URL || window.webkitURL || window.URL;
-      const svgUrl = URL.createObjectURL(svgBlob);
-      
-      // Create an image from the SVG blob
-      const img = new Image();
-      img.onload = () => {
-        // Draw the image onto the canvas
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0);
-        
-        // Convert canvas to blob and copy to clipboard
-        canvas.toBlob(async (blob) => {
-          if (blob) {
-            try {
-              const clipboardItem = new ClipboardItem({ 'image/png': blob });
-              await navigator.clipboard.write([clipboardItem]);
-              toast.success("Copied to clipboard as PNG!");
-            } catch (err) {
-              console.error("Clipboard API error:", err);
-              toast.error("Failed to copy to clipboard. Check console for details.");
-            }
-          }
-        }, 'image/png');
-        
-        // Clean up
-        URL.revokeObjectURL(svgUrl);
-      };
-      
-      img.src = svgUrl;
-    } catch (error) {
-      console.error("Error copying as PNG:", error);
-      toast.error("Failed to copy as PNG. Check console for details.");
-    }
-  };
-
   const createTextPath = (groupIndex: number, group: Group) => {
     const availableAngle = 2 * Math.PI;
     const startAngle = (slicesBeforeGroup[groupIndex] * (availableAngle / totalSlices));
@@ -178,24 +118,9 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center relative">
-      <div className="absolute top-2 right-2 z-10">
-        <Button 
-          onClick={copyAsPNG}
-          variant="outline"
-          className="bg-white/80 hover:bg-white text-black flex gap-2 items-center"
-        >
-          <Copy className="h-4 w-4" /> 
-          Copy as PNG
-        </Button>
-      </div>
+    <div className="flex flex-col items-center">
       <TooltipProvider>
-        <svg 
-          ref={svgRef}
-          width={config.svgSize} 
-          height={config.svgSize} 
-          viewBox={`0 0 ${config.svgSize} ${config.svgSize}`}
-        >
+        <svg width={config.svgSize} height={config.svgSize} viewBox={`0 0 ${config.svgSize} ${config.svgSize}`}>
           <CircleDefinitions
             config={config}
             groups={groups}
@@ -296,15 +221,14 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
           {groups.map((group, index) => (
             <text
               key={`theme-label-${index}`}
-              className="font-sans font-semibold uppercase tracking-wider"
+              className="text-xs font-medium uppercase"
               fill="white"
-              style={{ textShadow: '0px 1px 2px rgba(0,0,0,0.5)', fontSize: '14px' }}
+              style={{ zIndex: 50 }}
             >
               <textPath
                 href={`#curve${index}`}
                 startOffset="50%"
                 textAnchor="middle"
-                dominantBaseline="middle"
               >
                 {group.label || `Theme ${index + 1}`}
               </textPath>
@@ -315,15 +239,14 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
             group.slices.map((slice, sliceIndex) => (
               <text
                 key={`slice-label-${groupIndex}-${sliceIndex}`}
-                className="font-sans uppercase tracking-wide"
+                className="text-[0.5rem] font-medium uppercase"
                 fill="white"
-                style={{ textShadow: '0px 1px 2px rgba(0,0,0,0.5)', fontSize: '11px' }}
+                style={{ zIndex: 50 }}
               >
                 <textPath
                   href={`#slice-curve-${groupIndex}-${sliceIndex}`}
                   startOffset="50%"
                   textAnchor="middle"
-                  dominantBaseline="middle"
                 >
                   {slice.label || `Slice ${sliceIndex + 1}`}
                 </textPath>

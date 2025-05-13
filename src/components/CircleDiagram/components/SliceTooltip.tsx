@@ -24,7 +24,7 @@ export const SliceTooltip: React.FC<SliceTooltipProps> = ({ group, slice }) => {
         </div>
       </div>
       <p className="text-gray-500 text-sm leading-relaxed">
-        {slice.description || "No description available."}
+        {slice.description}
       </p>
     </TooltipContent>
   );
