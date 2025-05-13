@@ -14,7 +14,7 @@ export const SliceTooltip: React.FC<SliceTooltipProps> = ({ group, slice }) => {
       side="right" 
       sideOffset={5}
       align="center"
-      className="p-4 w-[300px] space-y-3 bg-white shadow-lg rounded-lg border-none font-inter"
+      className="p-4 w-[300px] space-y-3 bg-white shadow-lg rounded-lg border-none"
     >
       <div>
         <h3 className="text-xl font-semibold text-gray-900">{group.label}</h3>
@@ -24,7 +24,7 @@ export const SliceTooltip: React.FC<SliceTooltipProps> = ({ group, slice }) => {
         </div>
       </div>
       <p className="text-gray-500 text-sm leading-relaxed">
-        {slice.description}
+        {slice.description || "No description available."}
       </p>
     </TooltipContent>
   );
