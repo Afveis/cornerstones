@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Group } from './types';
@@ -86,32 +87,59 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
     if (!svgRef.current) return;
     
     try {
-      // Create a canvas with the same dimensions as the SVG
+      // Clone the SVG for modification without affecting displayed version
+      const svgElement = svgRef.current.cloneNode(true) as SVGSVGElement;
+      
+      // Add inline CSS with font styles to ensure proper text rendering
+      const styleElement = document.createElement('style');
+      styleElement.textContent = `
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        text {
+          font-family: 'Inter', sans-serif;
+          font-weight: 600;
+          paint-order: stroke;
+          stroke: rgba(0,0,0,0.4);
+          stroke-width: 1px;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+        }
+      `;
+      svgElement.prepend(styleElement);
+      
+      // Embed external resources (like fonts)
+      const serializer = new XMLSerializer();
+      let svgData = serializer.serializeToString(svgElement);
+      
+      // Set proper XML namespace for SVG
+      svgData = svgData.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"');
+      
+      // Create a higher-resolution canvas (2x scale for better quality)
+      const scale = 2; // Increase for higher resolution
       const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext('2d', { alpha: true });
       if (!ctx) {
         toast.error("Failed to create canvas context");
         return;
       }
       
-      // Set canvas dimensions
-      canvas.width = config.svgSize;
-      canvas.height = config.svgSize;
-      
-      // Get SVG data as a string
-      const svgData = new XMLSerializer().serializeToString(svgRef.current);
+      // Set canvas dimensions with higher resolution
+      canvas.width = config.svgSize * scale;
+      canvas.height = config.svgSize * scale;
       
       // Create a Blob from the SVG data
       const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-      const URL = window.URL || window.webkitURL || window.URL;
-      const svgUrl = URL.createObjectURL(svgBlob);
+      const url = URL.createObjectURL(svgBlob);
       
       // Create an image from the SVG blob
       const img = new Image();
       img.onload = () => {
-        // Draw the image onto the canvas
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // Clear canvas with transparent background
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Scale the context for higher resolution
+        ctx.scale(scale, scale);
+        
+        // Draw the image onto the canvas with transparent background
         ctx.drawImage(img, 0, 0);
         
         // Convert canvas to blob and copy to clipboard
@@ -129,10 +157,12 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
         }, 'image/png');
         
         // Clean up
-        URL.revokeObjectURL(svgUrl);
+        URL.revokeObjectURL(url);
       };
       
-      img.src = svgUrl;
+      // Set the image source to the SVG URL
+      img.src = url;
+      
     } catch (error) {
       console.error("Error copying as PNG:", error);
       toast.error("Failed to copy as PNG. Check console for details.");
@@ -298,6 +328,8 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
               className="text-xs font-medium uppercase"
               fill="white"
               style={{ zIndex: 50 }}
+              textAnchor="middle"
+              dominantBaseline="middle"
             >
               <textPath
                 href={`#curve${index}`}
@@ -316,6 +348,8 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
                 className="text-[0.5rem] font-medium uppercase"
                 fill="white"
                 style={{ zIndex: 50 }}
+                textAnchor="middle"
+                dominantBaseline="middle"
               >
                 <textPath
                   href={`#slice-curve-${groupIndex}-${sliceIndex}`}
