@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Group } from './types';
@@ -296,15 +295,14 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
           {groups.map((group, index) => (
             <text
               key={`theme-label-${index}`}
-              className="font-sans font-semibold uppercase tracking-wider"
+              className="text-xs font-medium uppercase"
               fill="white"
-              style={{ textShadow: '0px 1px 2px rgba(0,0,0,0.5)', fontSize: '14px' }}
+              style={{ zIndex: 50 }}
             >
               <textPath
                 href={`#curve${index}`}
                 startOffset="50%"
                 textAnchor="middle"
-                dominantBaseline="middle"
               >
                 {group.label || `Theme ${index + 1}`}
               </textPath>
@@ -315,15 +313,14 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
             group.slices.map((slice, sliceIndex) => (
               <text
                 key={`slice-label-${groupIndex}-${sliceIndex}`}
-                className="font-sans uppercase tracking-wide"
+                className="text-[0.5rem] font-medium uppercase"
                 fill="white"
-                style={{ textShadow: '0px 1px 2px rgba(0,0,0,0.5)', fontSize: '11px' }}
+                style={{ zIndex: 50 }}
               >
                 <textPath
                   href={`#slice-curve-${groupIndex}-${sliceIndex}`}
                   startOffset="50%"
                   textAnchor="middle"
-                  dominantBaseline="middle"
                 >
                   {slice.label || `Slice ${sliceIndex + 1}`}
                 </textPath>
