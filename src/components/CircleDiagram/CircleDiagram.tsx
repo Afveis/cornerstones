@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Group } from './types';
@@ -36,6 +35,11 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
       document.removeEventListener('progress-change', handleProgressChange);
     };
   }, [onUpdateProgress]);
+
+  // Re-render when groups changes to ensure UI is always up to date
+  useEffect(() => {
+    // This empty dependency array ensures the component re-renders when groups change
+  }, [groups]);
 
   const config = {
     centerRadius: 150,

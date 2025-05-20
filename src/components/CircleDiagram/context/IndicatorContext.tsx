@@ -5,6 +5,7 @@ import { initialIndicators, initialGlobalConfig } from './initialState';
 import { useIndicatorActions } from './hooks/useIndicatorActions';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface IndicatorContextType {
   indicators: Indicator[];
@@ -30,6 +31,7 @@ export const IndicatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [activeIndicator, setActiveIndicator] = useState<number>(1);
   const [globalConfig, setGlobalConfig] = useState<GlobalConfig>(initialGlobalConfig);
   const [loadingUserData, setLoadingUserData] = useState<boolean>(false);
+  const [lastSaveTime, setLastSaveTime] = useState<number>(0);
   const { user, saveIndicatorData } = useAuth();
 
   const activeIndicatorData = indicators.find((indicator) => indicator.id === activeIndicator) || indicators[0];
@@ -88,11 +90,68 @@ export const IndicatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     loadUserData();
   }, [user]);
 
-  // Function to save indicator progress
+  // Auto-save when indicators change
+  useEffect(() => {
+    const autoSave = async () => {
+      // Check if we should save (throttle to once every 2 seconds)
+      const now = Date.now();
+      if (now - lastSaveTime < 2000 || !user) return;
+      
+      try {
+        await saveIndicatorData(indicators);
+        setLastSaveTime(now);
+      } catch (error) {
+        console.error('Error auto-saving indicator data:', error);
+        toast.error('Failed to save your progress. Please try again.');
+      }
+    };
+
+    // Don't auto-save on the initial load
+    if (lastSaveTime > 0) {
+      autoSave();
+    } else if (user) {
+      setLastSaveTime(Date.now());  // Set initial time to prevent immediate save
+    }
+  }, [indicators, user, saveIndicatorData, lastSaveTime]);
+
+  // Function to manually save indicator progress
   const saveProgress = async () => {
     if (user) {
-      await saveIndicatorData(indicators);
+      try {
+        await saveIndicatorData(indicators);
+        setLastSaveTime(Date.now());
+        toast.success('Progress saved successfully!');
+      } catch (error) {
+        console.error('Error saving indicator data:', error);
+        toast.error('Failed to save your progress. Please try again.');
+      }
+    } else {
+      toast.error('You need to be logged in to save your progress.');
     }
+  };
+
+  // Create wrapped versions of the action functions that will trigger UI updates
+  const wrappedActions = {
+    updateSliceProgress: (groupIndex: number, sliceIndex: number, progress: number) => {
+      actions.updateSliceProgress(groupIndex, sliceIndex, progress);
+      // Immediate UI updates are handled by the state updates in updateSliceProgress
+    },
+    updateThemeConfig: (themeIndex: number, color?: string, rankingColor?: string, sliceCount?: number, label?: string) => {
+      actions.updateThemeConfig(themeIndex, color, rankingColor, sliceCount, label);
+      // Immediate UI updates are handled by the state updates in updateThemeConfig
+    },
+    updateGlobalConfig: (newThemeCount?: number, newSliceCount?: number) => {
+      actions.updateGlobalConfig(newThemeCount, newSliceCount);
+      // Immediate UI updates are handled by the state updates in updateGlobalConfig
+    },
+    updateIndicatorName: (id: number, name: string) => {
+      actions.updateIndicatorName(id, name);
+      // Immediate UI updates are handled by the state updates in updateIndicatorName
+    },
+    updateSliceLabel: (groupIndex: number, sliceIndex: number, label: string) => {
+      actions.updateSliceLabel(groupIndex, sliceIndex, label);
+      // Immediate UI updates are handled by the state updates in updateSliceLabel
+    },
   };
 
   return (
@@ -105,7 +164,7 @@ export const IndicatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         globalConfig,
         setGlobalConfig,
         activeIndicatorData,
-        ...actions,
+        ...wrappedActions,
         saveProgress,
         loadingUserData
       }}

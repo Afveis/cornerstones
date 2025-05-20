@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Indicator } from "./types";
@@ -27,9 +27,14 @@ export const IndicatorControls: React.FC<IndicatorControlsProps> = ({
   const [editingName, setEditingName] = useState(`Indicator ${activeIndicator}`);
   const [editingSlice, setEditingSlice] = useState<{groupIndex: number, sliceIndex: number, value: string} | null>(null);
 
+  // Update the editing name when activeIndicator changes
+  useEffect(() => {
+    setEditingName(indicator.name || `Indicator ${activeIndicator}`);
+  }, [indicator, activeIndicator]);
+
   const handleDoubleClick = () => {
     setIsEditing(true);
-    setEditingName(`Indicator ${activeIndicator}`);
+    setEditingName(indicator.name || `Indicator ${activeIndicator}`);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -88,7 +93,7 @@ export const IndicatorControls: React.FC<IndicatorControlsProps> = ({
             className="text-lg font-semibold cursor-pointer"
             onDoubleClick={handleDoubleClick}
           >
-            Indicator {activeIndicator}
+            {indicator.name || `Indicator ${activeIndicator}`}
           </h2>
         )}
         <input
