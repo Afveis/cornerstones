@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Indicator, GlobalConfig } from '../types';
 import { initialIndicators, initialGlobalConfig } from './initialState';
@@ -137,30 +136,21 @@ export const IndicatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const highestId = indicators.reduce((max, indicator) => Math.max(max, indicator.id), 0);
     const newId = highestId + 1;
     
-    // Clone the structure from the first indicator but with new ID and empty values
+    // Use the first indicator as a template for the new one to ensure consistency
+    const templateIndicator = indicators[0];
+    
     const newIndicator: Indicator = {
       id: newId,
       name: `Indicator ${newId}`,
       centerImage: "/placeholder.svg", // Default placeholder image
-      groups: globalConfig.themeCount > 0 
-        ? Array.from({ length: globalConfig.themeCount }).map((_, index) => {
-            // Calculate how many slices each group should have
-            const numSlices = 4; // Default to 4 slices per group or use a value from globalConfig
-            return {
-              label: `Theme ${index + 1}`,
-              color: `hsl(${(index * 360) / globalConfig.themeCount}, 70%, 50%)`, // Generate different colors
-              rankingColor: `hsl(${(index * 360) / globalConfig.themeCount}, 70%, 80%)`,
-              slices: Array.from({ length: numSlices }).map(() => ({
-                label: "",
-                progress: 0,
-                color: `hsl(${(index * 360) / globalConfig.themeCount}, 70%, 50%)`,
-                rankingColor: `hsl(${(index * 360) / globalConfig.themeCount}, 70%, 80%)`,
-                description: ""
-              })),
-              sliceCount: numSlices // Add the missing sliceCount property
-            };
-          })
-        : []
+      groups: templateIndicator.groups.map(group => ({
+        ...group,
+        slices: group.slices.map(slice => ({
+          ...slice,
+          label: "",  // Reset slice label
+          progress: 0 // Reset progress
+        }))
+      }))
     };
     
     setIndicators(prev => [...prev, newIndicator]);
