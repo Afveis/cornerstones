@@ -1,10 +1,15 @@
-import React, { useState, useEffect } from "react";
+
+import React, { useEffect } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Group } from './types';
 import { PathGenerators } from './PathGenerators';
 import { CircleSlice } from './components/CircleSlice';
 import { CircleDefinitions } from './components/CircleDefinitions';
-import { Button } from "@/components/ui/button";
+import { CenterCircle } from './components/CenterCircle';
+import { TextPathDefinitions } from './components/TextPathDefinitions';
+import { GroupLabels } from './components/GroupLabels';
+import { SliceLabels } from './components/SliceLabels';
+import { MiddleCirclePaths } from './components/MiddleCirclePaths';
 
 interface CircleDiagramProps {
   groups: Group[];
@@ -17,12 +22,9 @@ interface CircleDiagramProps {
 
 export const CircleDiagram: React.FC<CircleDiagramProps> = ({
   groups,
-  groupCount,
   onUpdateProgress,
   centerImage,
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
-
   useEffect(() => {
     const handleProgressChange = (event: Event) => {
       const customEvent = event as CustomEvent;
@@ -59,68 +61,6 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
 
   const pathGenerators = new PathGenerators(config, totalSlices, slicesBeforeGroup);
 
-  const handleCenterCircleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-          if (fileInput && file) {
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
-            fileInput.files = dataTransfer.files;
-            const changeEvent = new Event('change', { bubbles: true });
-            fileInput.dispatchEvent(changeEvent);
-          }
-        };
-        reader.readAsDataURL(file);
-      }
-    };
-    input.click();
-  };
-
-  const createTextPath = (groupIndex: number, group: Group) => {
-    const availableAngle = 2 * Math.PI;
-    const startAngle = (slicesBeforeGroup[groupIndex] * (availableAngle / totalSlices));
-    const endAngle = startAngle + (group.slices.length * (availableAngle / totalSlices));
-    const middleAngle = (startAngle + endAngle) / 2;
-    const radius = 160;
-    
-    const textLength = (group.label || `Theme ${groupIndex + 1}`).length;
-    const arcSpan = Math.max(0.2, Math.min(0.8, textLength * 0.04));
-    
-    const startX = config.outerRadius + Math.cos(middleAngle - arcSpan) * radius;
-    const startY = config.outerRadius + Math.sin(middleAngle - arcSpan) * radius;
-    const endX = config.outerRadius + Math.cos(middleAngle + arcSpan) * radius;
-    const endY = config.outerRadius + Math.sin(middleAngle + arcSpan) * radius;
-
-    return `M ${startX} ${startY} A ${radius} ${radius} 0 0 1 ${endX} ${endY}`;
-  };
-
-  const createSliceTextPath = (sliceIndex: number, groupIndex: number) => {
-    const availableAngle = 2 * Math.PI;
-    const sliceAngle = availableAngle / totalSlices;
-    const absoluteSliceIndex = slicesBeforeGroup[groupIndex] + sliceIndex;
-    const startAngle = absoluteSliceIndex * sliceAngle;
-    const endAngle = startAngle + sliceAngle;
-    const middleAngle = (startAngle + endAngle) / 2;
-    const radius = 280;
-    
-    const arcSpan = 0.2;
-    
-    const startX = config.outerRadius + Math.cos(middleAngle - arcSpan) * radius;
-    const startY = config.outerRadius + Math.sin(middleAngle - arcSpan) * radius;
-    const endX = config.outerRadius + Math.cos(middleAngle + arcSpan) * radius;
-    const endY = config.outerRadius + Math.sin(middleAngle + arcSpan) * radius;
-
-    return `M ${startX} ${startY} A ${radius} ${radius} 0 0 1 ${endX} ${endY}`;
-  };
-
   return (
     <div className="flex flex-col items-center">
       <TooltipProvider>
@@ -132,24 +72,12 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
           />
 
           <defs>
-            {groups.map((group, index) => (
-              <path
-                key={`text-path-${index}`}
-                id={`curve${index}`}
-                d={createTextPath(index, group)}
-                fill="none"
-              />
-            ))}
-            {groups.map((group, groupIndex) => (
-              group.slices.map((_, sliceIndex) => (
-                <path
-                  key={`slice-text-path-${groupIndex}-${sliceIndex}`}
-                  id={`slice-curve-${groupIndex}-${sliceIndex}`}
-                  d={createSliceTextPath(sliceIndex, groupIndex)}
-                  fill="none"
-                />
-              ))
-            ))}
+            <TextPathDefinitions 
+              groups={groups}
+              slicesBeforeGroup={slicesBeforeGroup}
+              totalSlices={totalSlices}
+              outerRadius={config.outerRadius}
+            />
           </defs>
 
           {groups.map((group, groupIndex) => (
@@ -166,97 +94,23 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
             ))
           ))}
 
-          {groups.map((group, index) => (
-            <path
-              key={`middle-${index}`}
-              d={pathGenerators.createMiddleCirclePath(index, group.slices.length)}
-              fill={group.rankingColor}
-              stroke="white"
-              strokeWidth={config.strokeWidth}
-              className="transition-opacity"
-            />
-          ))}
+          <MiddleCirclePaths 
+            groups={groups}
+            pathGenerators={pathGenerators}
+            config={config}
+          />
           
-          <g 
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            style={{ cursor: 'pointer' }}
-          >
-            <circle
-              cx={config.outerRadius}
-              cy={config.outerRadius}
-              r={config.centerRadius}
-              fill="white"
-              stroke="#E5E7EB"
-              filter="url(#centerShadow)"
-              className="transition-opacity"
-              style={{ opacity: isHovered ? 0.9 : 1 }}
-            />
-            
-            <image
-              x={config.outerRadius - config.centerRadius + 20}
-              y={config.outerRadius - config.centerRadius + 20}
-              width={config.centerRadius * 2 - 40}
-              height={config.centerRadius * 2 - 40}
-              href={centerImage}
-              preserveAspectRatio="xMidYMid meet"
-              clipPath="url(#centerCircleClip)"
-              className="transition-opacity"
-              style={{ opacity: isHovered ? 0.7 : 1 }}
-            />
+          <CenterCircle 
+            centerImage={centerImage}
+            config={config}
+          />
 
-            {isHovered && (
-              <foreignObject
-                x={config.outerRadius - 60}
-                y={config.outerRadius - 20}
-                width={120}
-                height={40}
-              >
-                <Button 
-                  className="w-full bg-white/80 hover:bg-white text-black border border-gray-200"
-                  onClick={handleCenterCircleClick}
-                >
-                  Replace Image
-                </Button>
-              </foreignObject>
-            )}
-          </g>
+          <GroupLabels 
+            groups={groups} 
+            paths={groups.map((_, i) => `#curve${i}`)} 
+          />
 
-          {groups.map((group, index) => (
-            <text
-              key={`theme-label-${index}`}
-              className="text-xs font-medium uppercase"
-              fill="white"
-              style={{ zIndex: 50 }}
-            >
-              <textPath
-                href={`#curve${index}`}
-                startOffset="50%"
-                textAnchor="middle"
-              >
-                {group.label || `Theme ${index + 1}`}
-              </textPath>
-            </text>
-          ))}
-
-          {groups.map((group, groupIndex) => (
-            group.slices.map((slice, sliceIndex) => (
-              <text
-                key={`slice-label-${groupIndex}-${sliceIndex}`}
-                className="text-[0.5rem] font-medium uppercase"
-                fill="white"
-                style={{ zIndex: 50 }}
-              >
-                <textPath
-                  href={`#slice-curve-${groupIndex}-${sliceIndex}`}
-                  startOffset="50%"
-                  textAnchor="middle"
-                >
-                  {slice.label || `Slice ${sliceIndex + 1}`}
-                </textPath>
-              </text>
-            ))
-          ))}
+          <SliceLabels groups={groups} />
         </svg>
       </TooltipProvider>
     </div>
