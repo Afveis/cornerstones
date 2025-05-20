@@ -182,11 +182,23 @@ export const useIndicatorActions = (
     });
   }, [activeIndicator, setIndicators]);
 
+  const updateCenterImage = useCallback((id: number, newImage: string) => {
+    setIndicators((prevIndicators) => {
+      return prevIndicators.map((indicator) => {
+        if (indicator.id === id) {
+          return { ...indicator, centerImage: newImage };
+        }
+        return indicator;
+      });
+    });
+  }, [setIndicators]);
+
   return {
     updateSliceProgress,
     updateThemeConfig,
     updateGlobalConfig,
     updateIndicatorName,
     updateSliceLabel,
+    updateCenterImage,
   };
 };

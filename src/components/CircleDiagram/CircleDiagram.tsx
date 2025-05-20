@@ -18,12 +18,14 @@ interface CircleDiagramProps {
   onUpdateGroupConfig: (groupIndex: number, color?: string, rankingColor?: string, sliceCount?: number) => void;
   onUpdateProgress: (groupIndex: number, sliceIndex: number, progress: number) => void;
   centerImage: string;
+  onCenterImageChange?: (newImage: string) => void;
 }
 
 export const CircleDiagram: React.FC<CircleDiagramProps> = ({
   groups,
   onUpdateProgress,
   centerImage,
+  onCenterImageChange,
 }) => {
   useEffect(() => {
     const handleProgressChange = (event: Event) => {
@@ -103,6 +105,7 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
           <CenterCircle 
             centerImage={centerImage}
             config={config}
+            onImageChange={onCenterImageChange}
           />
 
           <GroupLabels 

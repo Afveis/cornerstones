@@ -7,10 +7,15 @@ interface CenterCircleProps {
   config: {
     centerRadius: number;
     outerRadius: number;
-  }
+  };
+  onImageChange?: (newImage: string) => void;
 }
 
-export const CenterCircle: React.FC<CenterCircleProps> = ({ centerImage, config }) => {
+export const CenterCircle: React.FC<CenterCircleProps> = ({ 
+  centerImage, 
+  config,
+  onImageChange 
+}) => {
   const [isHovered, setIsHovered] = useState(false);
 
   const handleCenterCircleClick = (e: React.MouseEvent) => {
@@ -23,13 +28,9 @@ export const CenterCircle: React.FC<CenterCircleProps> = ({ centerImage, config 
       if (file) {
         const reader = new FileReader();
         reader.onload = (e) => {
-          const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-          if (fileInput && file) {
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
-            fileInput.files = dataTransfer.files;
-            const changeEvent = new Event('change', { bubbles: true });
-            fileInput.dispatchEvent(changeEvent);
+          const imageDataUrl = e.target?.result as string;
+          if (imageDataUrl && onImageChange) {
+            onImageChange(imageDataUrl);
           }
         };
         reader.readAsDataURL(file);
