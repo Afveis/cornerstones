@@ -23,6 +23,7 @@ interface IndicatorContextType {
   saveProgress: () => Promise<void>;
   loadingUserData: boolean;
   addNewIndicator: () => void;
+  updateCenterImage: (id: number, newImage: string) => void;
 }
 
 const IndicatorContext = createContext<IndicatorContextType | undefined>(undefined);
@@ -183,12 +184,13 @@ export const IndicatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     },
     updateIndicatorName: (id: number, name: string) => {
       actions.updateIndicatorName(id, name);
-      // Immediate UI updates are handled by the state updates in updateIndicatorName
     },
     updateSliceLabel: (groupIndex: number, sliceIndex: number, label: string) => {
       actions.updateSliceLabel(groupIndex, sliceIndex, label);
-      // Immediate UI updates are handled by the state updates in updateSliceLabel
     },
+    updateCenterImage: (id: number, newImage: string) => {
+      actions.updateCenterImage(id, newImage);
+    }
   };
 
   return (
@@ -204,7 +206,8 @@ export const IndicatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         ...wrappedActions,
         saveProgress,
         loadingUserData,
-        addNewIndicator
+        addNewIndicator,
+        updateCenterImage: wrappedActions.updateCenterImage
       }}
     >
       {children}
