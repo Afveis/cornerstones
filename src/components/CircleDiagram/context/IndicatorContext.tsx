@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Indicator, GlobalConfig } from '../types';
 import { initialIndicators, initialGlobalConfig } from './initialState';
@@ -22,6 +21,7 @@ interface IndicatorContextType {
   updateSliceLabel: (groupIndex: number, sliceIndex: number, label: string) => void;
   saveProgress: () => Promise<void>;
   loadingUserData: boolean;
+  addNewIndicator: () => void;
 }
 
 const IndicatorContext = createContext<IndicatorContextType | undefined>(undefined);
@@ -130,6 +130,34 @@ export const IndicatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   };
 
+  // Add new indicator function
+  const addNewIndicator = () => {
+    const highestId = indicators.reduce((max, indicator) => Math.max(max, indicator.id), 0);
+    const newId = highestId + 1;
+    
+    // Clone the structure from the first indicator but with new ID and empty values
+    const newIndicator: Indicator = {
+      id: newId,
+      name: `Indicator ${newId}`,
+      centerImage: "/placeholder.svg", // Default placeholder image
+      groups: globalConfig.themeCount > 0 
+        ? Array.from({ length: globalConfig.themeCount }).map((_, index) => ({
+            label: `Theme ${index + 1}`,
+            color: `hsl(${(index * 360) / globalConfig.themeCount}, 70%, 50%)`, // Generate different colors
+            rankingColor: `hsl(${(index * 360) / globalConfig.themeCount}, 70%, 80%)`,
+            slices: Array.from({ length: 4 }).map(() => ({
+              label: "",
+              progress: 0
+            }))
+          }))
+        : []
+    };
+    
+    setIndicators(prev => [...prev, newIndicator]);
+    setActiveIndicator(newId);
+    toast.success(`New indicator created: Indicator ${newId}`);
+  };
+
   // Create wrapped versions of the action functions that will trigger UI updates
   const wrappedActions = {
     updateSliceProgress: (groupIndex: number, sliceIndex: number, progress: number) => {
@@ -166,7 +194,8 @@ export const IndicatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         activeIndicatorData,
         ...wrappedActions,
         saveProgress,
-        loadingUserData
+        loadingUserData,
+        addNewIndicator
       }}
     >
       {children}

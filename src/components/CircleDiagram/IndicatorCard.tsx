@@ -16,7 +16,7 @@ export const IndicatorCard: React.FC<IndicatorCardProps> = ({
 }) => {
   return (
     <Card
-      className={`flex-1 p-4 cursor-pointer transition-all hover:scale-105 ${
+      className={`w-24 p-2 cursor-pointer transition-all hover:scale-105 ${
         isActive ? 'ring-2 ring-primary' : ''
       }`}
       onClick={onClick}
@@ -28,7 +28,7 @@ export const IndicatorCard: React.FC<IndicatorCardProps> = ({
           className="w-full h-full object-contain"
         />
       </div>
-      <p className="text-center mt-2">Indicator {indicator.id}</p>
+      <p className="text-center mt-1 text-xs truncate">{indicator.name || `Indicator ${indicator.id}`}</p>
     </Card>
   );
 };
