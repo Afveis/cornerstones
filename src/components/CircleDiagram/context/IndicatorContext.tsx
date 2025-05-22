@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Indicator, GlobalConfig } from '../types';
 import { initialIndicators, initialGlobalConfig } from './initialState';
@@ -92,7 +91,7 @@ export const IndicatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     loadUserData();
   }, [user]);
 
-  // Auto-save when indicators change
+  // Auto-save when indicators change - without notifications
   useEffect(() => {
     const autoSave = async () => {
       // Check if we should save (throttle to once every 2 seconds)
@@ -102,8 +101,10 @@ export const IndicatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       try {
         await saveIndicatorData(indicators);
         setLastSaveTime(now);
+        // Removed the toast.success notification here
       } catch (error) {
         console.error('Error auto-saving indicator data:', error);
+        // Keep error notification for failed saves
         toast.error('Failed to save your progress. Please try again.');
       }
     };
@@ -116,7 +117,7 @@ export const IndicatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   }, [indicators, user, saveIndicatorData, lastSaveTime]);
 
-  // Function to manually save indicator progress
+  // Function to manually save indicator progress - keep notification for manual saves
   const saveProgress = async () => {
     if (user) {
       try {
