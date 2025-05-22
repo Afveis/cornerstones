@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -111,9 +110,9 @@ export const IndicatorControls: React.FC<IndicatorControlsProps> = ({
         </Button>
       </div>
       {indicator.groups.map((group, groupIndex) => (
-        <div key={groupIndex} className="grid grid-cols-2 gap-4">
+        <div key={groupIndex} className="grid grid-cols-1 gap-4 w-full">
           {group.slices.map((slice, sliceIndex) => (
-            <div key={`${groupIndex}-${sliceIndex}`} className="flex flex-col gap-2 border p-2 rounded">
+            <div key={`${groupIndex}-${sliceIndex}`} className="flex flex-col gap-2 border p-2 rounded w-full">
               <div className="flex items-center gap-2 justify-between">
                 {editingSlice && editingSlice.groupIndex === groupIndex && editingSlice.sliceIndex === sliceIndex ? (
                   <div className="flex gap-2 flex-1">
@@ -144,7 +143,6 @@ export const IndicatorControls: React.FC<IndicatorControlsProps> = ({
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm">Progress:</span>
                 <Input
                   type="number"
                   min="0"
