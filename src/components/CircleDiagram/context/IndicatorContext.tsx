@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Indicator, GlobalConfig } from '../types';
 import { initialIndicators, initialGlobalConfig } from './initialState';
@@ -143,11 +144,11 @@ export const IndicatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       id: newId,
       name: `Indicator ${newId}`,
       centerImage: "/placeholder.svg", // Default placeholder image
-      groups: templateIndicator.groups.map(group => ({
+      groups: templateIndicator.groups.map((group, groupIndex) => ({
         ...group,
-        slices: group.slices.map(slice => ({
+        slices: group.slices.map((slice, sliceIndex) => ({
           ...slice,
-          label: "",  // Reset slice label
+          label: slice.label,  // Keep the same label from the template
           progress: 0 // Reset progress
         }))
       }))

@@ -161,26 +161,26 @@ export const useIndicatorActions = (
 
   const updateSliceLabel = useCallback((groupIndex: number, sliceIndex: number, label: string) => {
     setIndicators((prevIndicators) => {
-      return prevIndicators.map((indicator) => {
-        if (indicator.id === activeIndicator) {
-          const updatedGroups = indicator.groups.map((group: Group, i: number) => {
-            if (i === groupIndex) {
-              const updatedSlices = group.slices.map((slice, j) => {
-                if (j === sliceIndex) {
-                  return { ...slice, label };
-                }
-                return slice;
-              });
-              return { ...group, slices: updatedSlices };
-            }
-            return group;
-          });
-          return { ...indicator, groups: updatedGroups };
-        }
-        return indicator;
+      // Create a copy of the updated indicators
+      const updatedIndicators = prevIndicators.map((indicator) => {
+        // For all indicators, update the slice label at the specified group and slice index
+        const updatedGroups = indicator.groups.map((group: Group, i: number) => {
+          if (i === groupIndex) {
+            const updatedSlices = group.slices.map((slice, j) => {
+              if (j === sliceIndex) {
+                return { ...slice, label };
+              }
+              return slice;
+            });
+            return { ...group, slices: updatedSlices };
+          }
+          return group;
+        });
+        return { ...indicator, groups: updatedGroups };
       });
+      return updatedIndicators;
     });
-  }, [activeIndicator, setIndicators]);
+  }, [setIndicators]);
 
   const updateCenterImage = useCallback((id: number, newImage: string) => {
     setIndicators((prevIndicators) => {
