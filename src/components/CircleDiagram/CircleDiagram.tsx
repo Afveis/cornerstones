@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Group } from './types';
@@ -10,7 +9,6 @@ import { TextPathDefinitions } from './components/TextPathDefinitions';
 import { GroupLabels } from './components/GroupLabels';
 import { SliceLabels } from './components/SliceLabels';
 import { MiddleCirclePaths } from './components/MiddleCirclePaths';
-
 interface CircleDiagramProps {
   groups: Group[];
   groupCount: number;
@@ -20,20 +18,22 @@ interface CircleDiagramProps {
   centerImage: string;
   onCenterImageChange?: (newImage: string) => void;
 }
-
 export const CircleDiagram: React.FC<CircleDiagramProps> = ({
   groups,
   onUpdateProgress,
   centerImage,
-  onCenterImageChange,
+  onCenterImageChange
 }) => {
   useEffect(() => {
     const handleProgressChange = (event: Event) => {
       const customEvent = event as CustomEvent;
-      const { groupIndex, sliceIndex, progress } = customEvent.detail;
+      const {
+        groupIndex,
+        sliceIndex,
+        progress
+      } = customEvent.detail;
       onUpdateProgress(groupIndex, sliceIndex, progress);
     };
-
     document.addEventListener('progress-change', handleProgressChange);
     return () => {
       document.removeEventListener('progress-change', handleProgressChange);
@@ -44,7 +44,6 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
   useEffect(() => {
     // This empty dependency array ensures the component re-renders when groups change
   }, [groups]);
-
   const config = {
     centerRadius: 150,
     middleRadius: 180,
@@ -52,70 +51,33 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
     progressStep: 24,
     svgSize: 700,
     strokeWidth: 4,
-    rankingStrokeWidth: 24,
+    rankingStrokeWidth: 24
   };
-
   const totalSlices = groups.reduce((acc, group) => acc + group.slices.length, 0);
   const slicesBeforeGroup = groups.reduce((acc, group, index) => {
     acc[index] = index === 0 ? 0 : acc[index - 1] + groups[index - 1].slices.length;
     return acc;
   }, Array(groups.length).fill(0));
-
   const pathGenerators = new PathGenerators(config, totalSlices, slicesBeforeGroup);
-
-  return (
-    <div className="flex flex-col items-center">
+  return <div className="flex flex-col items-center bg-white py-[49px]">
       <TooltipProvider>
         <svg width={config.svgSize} height={config.svgSize} viewBox={`0 0 ${config.svgSize} ${config.svgSize}`}>
-          <CircleDefinitions
-            config={config}
-            groups={groups}
-            pathGenerators={pathGenerators}
-          />
+          <CircleDefinitions config={config} groups={groups} pathGenerators={pathGenerators} />
 
           <defs>
-            <TextPathDefinitions 
-              groups={groups}
-              slicesBeforeGroup={slicesBeforeGroup}
-              totalSlices={totalSlices}
-              outerRadius={config.outerRadius}
-            />
+            <TextPathDefinitions groups={groups} slicesBeforeGroup={slicesBeforeGroup} totalSlices={totalSlices} outerRadius={config.outerRadius} />
           </defs>
 
-          {groups.map((group, groupIndex) => (
-            group.slices.map((slice, sliceIndex) => (
-              <CircleSlice
-                key={`slice-${groupIndex}-${sliceIndex}`}
-                group={group}
-                slice={slice}
-                sliceIndex={sliceIndex}
-                groupIndex={groupIndex}
-                pathGenerators={pathGenerators}
-                config={config}
-              />
-            ))
-          ))}
+          {groups.map((group, groupIndex) => group.slices.map((slice, sliceIndex) => <CircleSlice key={`slice-${groupIndex}-${sliceIndex}`} group={group} slice={slice} sliceIndex={sliceIndex} groupIndex={groupIndex} pathGenerators={pathGenerators} config={config} />))}
 
-          <MiddleCirclePaths 
-            groups={groups}
-            pathGenerators={pathGenerators}
-            config={config}
-          />
+          <MiddleCirclePaths groups={groups} pathGenerators={pathGenerators} config={config} />
           
-          <CenterCircle 
-            centerImage={centerImage}
-            config={config}
-            onImageChange={onCenterImageChange}
-          />
+          <CenterCircle centerImage={centerImage} config={config} onImageChange={onCenterImageChange} />
 
-          <GroupLabels 
-            groups={groups} 
-            paths={groups.map((_, i) => `#curve${i}`)} 
-          />
+          <GroupLabels groups={groups} paths={groups.map((_, i) => `#curve${i}`)} />
 
           <SliceLabels groups={groups} />
         </svg>
       </TooltipProvider>
-    </div>
-  );
+    </div>;
 };
