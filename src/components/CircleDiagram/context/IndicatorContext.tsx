@@ -4,7 +4,8 @@ import { initialIndicators, initialGlobalConfig } from './initialState';
 import { useIndicatorActions } from './hooks/useIndicatorActions';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+// Remove toast import since we're disabling all notifications
+// import { toast } from 'sonner';
 
 interface IndicatorContextType {
   indicators: Indicator[];
@@ -101,11 +102,10 @@ export const IndicatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       try {
         await saveIndicatorData(indicators);
         setLastSaveTime(now);
-        // Removed the toast.success notification here
+        // No toast notifications here
       } catch (error) {
         console.error('Error auto-saving indicator data:', error);
-        // Keep error notification for failed saves
-        toast.error('Failed to save your progress. Please try again.');
+        // No toast notifications for errors either
       }
     };
 
@@ -117,19 +117,20 @@ export const IndicatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   }, [indicators, user, saveIndicatorData, lastSaveTime]);
 
-  // Function to manually save indicator progress - keep notification for manual saves
+  // Function to manually save indicator progress - without notifications as well
   const saveProgress = async () => {
     if (user) {
       try {
         await saveIndicatorData(indicators);
         setLastSaveTime(Date.now());
-        toast.success('Progress saved successfully!');
+        // No toast notifications for manual saves
       } catch (error) {
         console.error('Error saving indicator data:', error);
-        toast.error('Failed to save your progress. Please try again.');
+        // No toast notifications for errors
       }
     } else {
-      toast.error('You need to be logged in to save your progress.');
+      // No toast notification for not being logged in
+      console.log('User needs to be logged in to save progress');
     }
   };
 
@@ -157,7 +158,7 @@ export const IndicatorProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     
     setIndicators(prev => [...prev, newIndicator]);
     setActiveIndicator(newId);
-    toast.success(`New indicator created: Indicator ${newId}`);
+    // No toast notification for adding new indicator
   };
 
   // Create wrapped versions of the action functions that will trigger UI updates
