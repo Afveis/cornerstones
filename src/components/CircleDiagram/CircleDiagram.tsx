@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Group } from './types';
@@ -9,6 +10,7 @@ import { TextPathDefinitions } from './components/TextPathDefinitions';
 import { GroupLabels } from './components/GroupLabels';
 import { SliceLabels } from './components/SliceLabels';
 import { MiddleCirclePaths } from './components/MiddleCirclePaths';
+
 interface CircleDiagramProps {
   groups: Group[];
   groupCount: number;
@@ -17,12 +19,15 @@ interface CircleDiagramProps {
   onUpdateProgress: (groupIndex: number, sliceIndex: number, progress: number) => void;
   centerImage: string;
   onCenterImageChange?: (newImage: string) => void;
+  indicatorName?: string; // Add optional prop for indicator name
 }
+
 export const CircleDiagram: React.FC<CircleDiagramProps> = ({
   groups,
   onUpdateProgress,
   centerImage,
-  onCenterImageChange
+  onCenterImageChange,
+  indicatorName // Receive the indicator name prop
 }) => {
   useEffect(() => {
     const handleProgressChange = (event: Event) => {
@@ -59,6 +64,7 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
     return acc;
   }, Array(groups.length).fill(0));
   const pathGenerators = new PathGenerators(config, totalSlices, slicesBeforeGroup);
+
   return <div className="flex flex-col items-center bg-white py-[49px]">
       <TooltipProvider>
         <svg width={config.svgSize} height={config.svgSize} viewBox={`0 0 ${config.svgSize} ${config.svgSize}`}>
@@ -79,5 +85,10 @@ export const CircleDiagram: React.FC<CircleDiagramProps> = ({
           <SliceLabels groups={groups} />
         </svg>
       </TooltipProvider>
+      
+      {/* Add indicator title underneath the wheel */}
+      {indicatorName && (
+        <h2 className="mt-4 text-2xl font-semibold text-center">{indicatorName}</h2>
+      )}
     </div>;
 };
