@@ -3,6 +3,7 @@ import React from "react";
 import { useIndicator } from "../context/IndicatorContext";
 import { CircleDiagram } from "../CircleDiagram";
 import { IndicatorList } from "../IndicatorList";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export const DiagramSection = () => {
   const {
@@ -23,27 +24,29 @@ export const DiagramSection = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-full p-4">
-      <div className="w-full max-w-6xl">
-        <CircleDiagram
-          groups={activeIndicatorData.groups}
-          groupCount={globalConfig.themeCount}
-          onUpdateGroupCount={updateGlobalConfig}
-          onUpdateGroupConfig={updateThemeConfig}
-          onUpdateProgress={updateSliceProgress}
-          centerImage={activeIndicatorData.centerImage}
-          onCenterImageChange={handleCenterImageChange}
-        />
-
-        <div className="mt-10">
-          <IndicatorList
-            indicators={indicators}
-            activeIndicator={activeIndicator}
-            onSelectIndicator={setActiveIndicator}
-            onAddIndicator={addNewIndicator}
+    <ScrollArea className="h-full w-full">
+      <div className="flex flex-col items-center justify-start min-h-full p-4 pb-20">
+        <div className="w-full max-w-6xl">
+          <CircleDiagram
+            groups={activeIndicatorData.groups}
+            groupCount={globalConfig.themeCount}
+            onUpdateGroupCount={updateGlobalConfig}
+            onUpdateGroupConfig={updateThemeConfig}
+            onUpdateProgress={updateSliceProgress}
+            centerImage={activeIndicatorData.centerImage}
+            onCenterImageChange={handleCenterImageChange}
           />
+
+          <div className="mt-10 mb-10">
+            <IndicatorList
+              indicators={indicators}
+              activeIndicator={activeIndicator}
+              onSelectIndicator={setActiveIndicator}
+              onAddIndicator={addNewIndicator}
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </ScrollArea>
   );
 };
