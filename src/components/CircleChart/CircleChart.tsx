@@ -49,65 +49,65 @@ export const CircleChart: React.FC<CircleChartProps> = ({ data }) => {
     positionGroups[groupKey].push(point);
   });
 
+  // Group data by category
+  const categorizedData: { [key: string]: typeof processedData } = {};
+  processedData.forEach(point => {
+    if (!categorizedData[point.category]) {
+      categorizedData[point.category] = [];
+    }
+    categorizedData[point.category].push(point);
+  });
+
   return (
     <div className="w-full bg-background p-6 rounded-lg border">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8 text-sm text-muted-foreground">
-        <div className="flex flex-col items-start">
-          <span className="font-medium">0%</span>
-          <span>disagree</span>
-        </div>
-        <div className="flex flex-col items-center">
-          <span className="font-medium">50/50</span>
-          <span>split</span>
-        </div>
-        <div className="flex flex-col items-end">
-          <span className="font-medium">100%</span>
-          <span>agree</span>
-        </div>
+      {/* Category Headers */}
+      <div className="grid gap-4 mb-6" style={{ gridTemplateColumns: `repeat(${categories.length}, 1fr)` }}>
+        {categories.map((category) => (
+          <div key={category} className="text-center">
+            <h3 className="font-medium text-sm uppercase tracking-wide text-foreground">
+              {category}
+            </h3>
+          </div>
+        ))}
       </div>
 
       {/* Chart Area */}
-      <div className="relative h-64 border-b border-border">
-        <TooltipProvider>
-          {Object.entries(positionGroups).map(([groupKey, points]) => {
-            const position = parseInt(groupKey);
-            return points.map((point, stackIndex) => (
-              <Tooltip key={`${point.id}-${stackIndex}`}>
-                <TooltipTrigger asChild>
-                  <div
-                    className="absolute w-3 h-3 rounded-full cursor-pointer transition-all duration-200 hover:scale-125"
-                    style={{
-                      left: `${position}%`,
-                      bottom: `${(stackIndex * 16) + 20}px`,
-                      backgroundColor: point.color,
-                      transform: 'translateX(-50%)',
-                    }}
-                    onMouseEnter={() => setHoveredPoint(point)}
-                    onMouseLeave={() => setHoveredPoint(null)}
-                  />
-                </TooltipTrigger>
-                <TooltipContent 
-                  side="top" 
-                  className="max-w-xs p-3 bg-popover border shadow-lg"
-                >
-                  <div className="space-y-2">
-                    <div className="font-medium text-sm">{point.category}</div>
-                    <div className="text-sm text-muted-foreground leading-relaxed">
-                      {point.quote}
-                    </div>
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            ));
-          })}
-        </TooltipProvider>
-
-        {/* Scale markers */}
-        <div className="absolute bottom-0 left-0 w-full h-px bg-border" />
-        <div className="absolute bottom-0 left-0 w-px h-2 bg-border" />
-        <div className="absolute bottom-0 left-1/2 w-px h-2 bg-border transform -translate-x-1/2" />
-        <div className="absolute bottom-0 right-0 w-px h-2 bg-border" />
+      <div className="relative h-64">
+        <div className="grid gap-4 h-full" style={{ gridTemplateColumns: `repeat(${categories.length}, 1fr)` }}>
+          {categories.map((category, categoryIndex) => (
+            <div key={category} className="relative border-l border-border pl-4">
+              <TooltipProvider>
+                {categorizedData[category]?.map((point, pointIndex) => (
+                  <Tooltip key={`${point.id}-${pointIndex}`}>
+                    <TooltipTrigger asChild>
+                      <div
+                        className="absolute w-3 h-3 rounded-full cursor-pointer transition-all duration-200 hover:scale-125"
+                        style={{
+                          left: `${(pointIndex % 3) * 20 + 10}px`,
+                          top: `${Math.floor(pointIndex / 3) * 20 + 20}px`,
+                          backgroundColor: point.color,
+                        }}
+                        onMouseEnter={() => setHoveredPoint(point)}
+                        onMouseLeave={() => setHoveredPoint(null)}
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent 
+                      side="top" 
+                      className="max-w-xs p-3 bg-popover border shadow-lg"
+                    >
+                      <div className="space-y-2">
+                        <div className="font-medium text-sm">{point.category}</div>
+                        <div className="text-sm text-muted-foreground leading-relaxed">
+                          {point.quote}
+                        </div>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                ))}
+              </TooltipProvider>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Legend */}
