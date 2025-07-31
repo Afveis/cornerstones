@@ -60,7 +60,7 @@ export const CircleChart: React.FC<CircleChartProps> = ({ data }) => {
       <div className="relative min-h-96">
         <div className="grid gap-8" style={{ gridTemplateColumns: `repeat(${categories.length}, 1fr)` }}>
           {categories.map((category) => (
-            <div key={category} className="flex flex-col items-center space-y-4">
+            <div key={category} className="flex flex-col items-center justify-end space-y-4 min-h-96">
               <TooltipProvider>
                 <div className="flex flex-wrap gap-2 justify-center max-w-48">
                   {categorizedData[category]?.map((point, pointIndex) => (
