@@ -17,14 +17,31 @@ export const CSVUploader: React.FC<CSVUploaderProps> = ({ onDataLoad }) => {
     Papa.parse(file, {
       header: false,
       complete: (results) => {
-        const data = results.data
-          .filter((row: any) => row.length >= 2 && row[0] && row[1])
-          .map((row: any) => ({
-            category: String(row[0]).trim(),
-            quote: String(row[1]).trim()
-          }));
+        const validRows = results.data.filter((row: any) => 
+          Array.isArray(row) && row.length >= 2 && row[0] && row[1]
+        );
         
-        onDataLoad(data);
+        const processedData: { category: string; quote: string }[] = [];
+        
+        validRows.forEach((row: any) => {
+          const category = row[0].toString().trim();
+          const quotesText = row[1].toString();
+          
+          // Split quotes by dots and filter out empty ones
+          const quotes = quotesText
+            .split('.')
+            .map(quote => quote.trim())
+            .filter(quote => quote.length > 0)
+            .map(quote => quote.replace(/^\s*[\t\n\r]+\s*/, '').trim()); // Clean up whitespace and tabs
+          
+          quotes.forEach(quote => {
+            if (quote) {
+              processedData.push({ category, quote });
+            }
+          });
+        });
+        
+        onDataLoad(processedData);
       },
       error: (error) => {
         console.error('Error parsing CSV:', error);
