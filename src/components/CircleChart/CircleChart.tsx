@@ -21,10 +21,11 @@ export const CircleChart: React.FC<CircleChartProps> = ({ data }) => {
   // Get unique categories and assign colors
   const categories = [...new Set(data.map(d => d.category))];
   const colors = [
-    'hsl(var(--primary))',
-    'hsl(var(--secondary))', 
-    'hsl(var(--accent))',
-    'hsl(var(--muted-foreground))',
+    'hsl(320, 30%, 65%)',  // Pink/purple
+    'hsl(200, 25%, 60%)',  // Blue/grey
+    'hsl(320, 35%, 55%)',  // Darker pink/purple
+    'hsl(40, 70%, 70%)',   // Yellow/orange
+    'hsl(90, 35%, 65%)',   // Green
   ];
 
   // Process data with colors and IDs
