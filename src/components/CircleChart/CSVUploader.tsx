@@ -66,10 +66,10 @@ export const CSVUploader: React.FC<CSVUploaderProps> = ({ onDataLoad }) => {
           <span>Expected format:</span>
         </div>
         <div className="bg-muted/50 p-3 rounded text-xs font-mono">
-          <div>Category,Quote</div>
-          <div>Agree,"This is a great idea"</div>
-          <div>Neutral,"Not sure about this"</div>
-          <div>Disagree,"I don't think this works"</div>
+          <div>Theme,Quote</div>
+          <div>Community Cohesion,"Great community spirit here"</div>
+          <div>Heritage & Culture,"Rich cultural traditions"</div>
+          <div>Community Cohesion,"Strong neighborhood bonds"</div>
         </div>
       </div>
     </div>
