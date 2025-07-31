@@ -4,7 +4,11 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 interface DataPoint {
   category: string;
   quote: string;
-  position?: number; // 0-100 position on the agreement scale
+}
+
+interface ProcessedDataPoint extends DataPoint {
+  id: number;
+  color: string;
 }
 
 interface CircleChartProps {
@@ -12,45 +16,26 @@ interface CircleChartProps {
 }
 
 export const CircleChart: React.FC<CircleChartProps> = ({ data }) => {
-  const [hoveredPoint, setHoveredPoint] = useState<DataPoint | null>(null);
+  const [hoveredPoint, setHoveredPoint] = useState<ProcessedDataPoint | null>(null);
 
   // Get unique categories and assign colors
   const categories = [...new Set(data.map(d => d.category))];
   const colors = [
-    'hsl(var(--destructive))', // Red for disagreement
-    'hsl(var(--muted-foreground))', // Gray for neutral
-    'hsl(var(--primary))', // Green for agreement
+    'hsl(var(--primary))',
+    'hsl(var(--secondary))', 
+    'hsl(var(--accent))',
+    'hsl(var(--muted-foreground))',
   ];
 
-  // Group data by category and calculate positions
-  const processedData = data.map((point, index) => {
-    const categoryIndex = categories.indexOf(point.category);
-    // Create a spread across the chart based on category
-    const basePosition = (categoryIndex / (categories.length - 1)) * 100;
-    // Add some random offset for visual appeal
-    const randomOffset = (Math.random() - 0.5) * 20;
-    const position = Math.max(0, Math.min(100, basePosition + randomOffset));
-    
-    return {
-      ...point,
-      position,
-      color: colors[categoryIndex % colors.length],
-      id: index
-    };
-  });
+  // Process data with colors and IDs
+  const processedData: ProcessedDataPoint[] = data.map((point, index) => ({
+    ...point,
+    id: index,
+    color: colors[categories.indexOf(point.category) % colors.length]
+  }));
 
-  // Group by position ranges for stacking
-  const positionGroups: { [key: number]: typeof processedData } = {};
-  processedData.forEach(point => {
-    const groupKey = Math.floor(point.position / 5) * 5; // Group by 5% ranges
-    if (!positionGroups[groupKey]) {
-      positionGroups[groupKey] = [];
-    }
-    positionGroups[groupKey].push(point);
-  });
-
-  // Group data by category
-  const categorizedData: { [key: string]: typeof processedData } = {};
+  // Group data by category for column display
+  const categorizedData: { [key: string]: ProcessedDataPoint[] } = {};
   processedData.forEach(point => {
     if (!categorizedData[point.category]) {
       categorizedData[point.category] = [];
@@ -124,7 +109,7 @@ export const CircleChart: React.FC<CircleChartProps> = ({ data }) => {
           ))}
         </div>
         <div className="mt-2 text-xs">
-          ALL IDEAS, SORTED BY AGREEMENT RATE
+          ALL QUOTES, GROUPED BY THEME
         </div>
       </div>
     </div>
