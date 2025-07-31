@@ -62,12 +62,12 @@ export const CircleChart: React.FC<CircleChartProps> = ({ data }) => {
           {categories.map((category) => (
             <div key={category} className="flex flex-col items-center space-y-4">
               <TooltipProvider>
-                <div className="grid grid-cols-5 gap-3 justify-items-center">
+                <div className="flex flex-wrap gap-2 justify-center max-w-48">
                   {categorizedData[category]?.map((point, pointIndex) => (
-                    <Tooltip key={`${point.id}-${pointIndex}`}>
+                    <Tooltip key={point.id}>
                       <TooltipTrigger asChild>
                         <div
-                          className="w-4 h-4 rounded-full cursor-pointer transition-all duration-200 hover:scale-125 hover:shadow-lg"
+                          className="w-6 h-6 rounded-full cursor-pointer transition-all duration-200 hover:scale-125 hover:shadow-lg border border-border/20"
                           style={{
                             backgroundColor: point.color,
                           }}
